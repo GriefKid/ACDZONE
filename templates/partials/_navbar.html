@@ -1,0 +1,31 @@
+<header class="bg-brand-900">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="flex h-16 items-center justify-between">
+      <!-- Logo -->
+      <a href="/" class="text-white font-semibold tracking-wide">
+        ACDZONE
+      </a>
+
+      <!-- Nav -->
+      <nav class="hidden md:flex items-center gap-6 text-sm text-white/80">
+        <a class="hover:text-white" href="/">Home</a>
+        <a class="hover:text-white" href="/products/">Products</a>
+        <a class="hover:text-white" href="/solutions/">Solutions</a>
+        <a class="hover:text-white" href="/news/">News</a>
+        <a class="hover:text-white" href="/mag/">Mag</a>
+        <a class="hover:text-white" href="/nations/">Nations</a>
+        <a class="hover:text-white" href="/contact/">Contacts</a>
+      </nav>
+
+      <!-- CTA -->
+      <div class="flex items-center gap-3">
+        <a
+          href="{{ home.hero_primary_cta_url|default:'#' }}"
+          class="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-medium text-brand-900 hover:bg-white/90"
+        >
+          Get Started
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

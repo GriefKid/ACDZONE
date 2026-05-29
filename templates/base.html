@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ACDZONE{% endblock %}</title>
+
+  <!-- Tailwind CDN (برای شروع سریع) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Optional: تنظیم رنگ‌ها -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              900: "#2A004F",
+              800: "#3A0A6B",
+              100: "#F2EAFE"
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-white text-slate-900">
+  {% include "partials/_navbar.html" %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/_footer.html" %}
+</body>
+</html>
