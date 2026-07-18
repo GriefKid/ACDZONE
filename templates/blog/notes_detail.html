@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{{ post.title }} · ACDNotes · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<article class="container py-5" style="max-width: 760px;">
+  <a href="{% url 'blog:acdnotes' %}" class="d-inline-flex align-items-center gap-1 mb-4 text-decoration-none acd-reveal">
+    <i class="bi bi-{% if LANGUAGE_BIDI %}arrow-right{% else %}arrow-left{% endif %}"></i>
+    {% t "بازگشت به ACDNotes" %}
+  </a>
+
+  <span class="acd-news-date d-inline-flex mb-2 acd-reveal"><i class="bi bi-calendar3"></i> {{ post.published_at|date:"Y/m/d" }}</span>
+  <h1 class="h3 mb-4 acd-reveal">{{ post.title }}</h1>
+
+  {% if post.display_image %}
+  <div class="ratio ratio-21x9 rounded-4 overflow-hidden acd-media-placeholder mb-4 acd-reveal">
+    <img src="{{ post.display_image }}" alt="{{ post.title }}" style="object-fit: cover;">
+  </div>
+  {% endif %}
+
+  <div class="acd-article-body acd-reveal">{{ post.body|linebreaks }}</div>
+</article>
+{% endblock %}

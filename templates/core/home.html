@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load i18n static acd_i18n %}
+
+{% block title %}{{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<!-- Site intro: video/photo/text — will become admin-managed in the next stage -->
+<section class="acd-hero acd-aurora text-white py-5">
+  <img src="{% static 'img/favicon.svg' %}" alt="" aria-hidden="true" class="acd-hero-watermark">
+  <div class="container py-4">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6 acd-reveal">
+        <h1 class="display-5 fw-bold acd-gradient-text">{% t "به ACD Zone خوش آمدید" %}</h1>
+        <p class="lead" style="color: rgba(255,255,255,.85);">
+          {% t "مقصد شما برای خرید کارت‌های شارژ بین‌المللی و تجربه‌ی بالن‌سواری‌های فراموش‌نشدنی." %}
+        </p>
+        <a href="#products" class="btn btn-acd-primary btn-lg mt-2">{% t "مشاهده محصولات" %}</a>
+      </div>
+      <div class="col-lg-6 acd-reveal">
+        <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-sm acd-media-placeholder">
+          {% if intro_video_exists %}
+          <video controls class="w-100 h-100" style="object-fit: cover;">
+            <source src="{% static 'video/intro.mp4' %}" type="video/mp4">
+            {% if intro_subtitle_exists %}
+            <track src="{% static 'video/intro-fa.vtt' %}" kind="subtitles" srclang="fa" label="{% t 'فارسی' %}" default>
+            {% endif %}
+            {% t "مرورگر شما از پخش این ویدیو پشتیبانی نمی‌کند." %}
+          </video>
+          {% else %}
+          <div class="d-flex align-items-center justify-content-center">
+            <span class="text-white-50 text-center px-3">
+              {% t "ویدیو یا تصویر معرفی سایت (از پنل ادمین قابل مدیریت خواهد بود)" %}
+            </span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Products intro — big slide-through carousel, one product per slide.
+     products_preview (apps/core/views.py) is a real Product queryset now;
+     add/edit products from the admin panel and this updates automatically. -->
+<section id="products" class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5 acd-reveal">{% t "محصولات ما" %}</h2>
+
+    {% if products_preview %}
+    <div id="productsCarousel" class="carousel slide acd-product-carousel acd-reveal" data-bs-ride="carousel" data-bs-interval="5000">
+      <div class="carousel-inner">
+        {% for product in products_preview %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <!-- Whole slide is one link into the product's page — no separate
+               button; the caption lives on top of the image itself. -->
+          <a href="{% url product.url_name %}" class="acd-slide-link">
+            <div class="ratio ratio-21x9 rounded-4 acd-media-placeholder">
+              {% if product.display_image %}
+                <img src="{{ product.display_image }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}">
+              {% else %}
+                <div class="d-flex align-items-center justify-content-center">
+                  <span class="text-white-50 text-center px-3">{% t "تصویر محصول به‌زودی" %}</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="acd-slide-overlay">
+              <h3 class="h5 mb-1">{{ product.title }}</h3>
+              <p class="mb-0 acd-slide-desc">{{ product.description }}</p>
+              <span class="acd-slide-cta">
+                {% t "مشاهده" %}
+                <i class="bi bi-{% if LANGUAGE_BIDI %}arrow-left{% else %}arrow-right{% endif %}"></i>
+              </span>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#productsCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{% t "قبلی" %}</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#productsCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{% t "بعدی" %}</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="acd-empty-state acd-reveal">
+      <span class="acd-empty-icon"><i class="bi bi-bag"></i></span>
+      <p class="text-muted mb-0">{% t "به‌زودی محصولی برای نمایش اضافه می‌شود." %}</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Latest posts from ACDNews / ACDNotes -->
+<section class="py-5 acd-section-alt acd-aurora acd-aurora-soft">
+  <div class="container">
+    <h2 class="text-center mb-5 acd-reveal">{% t "آخرین مطالب" %}</h2>
+    {% if latest_posts %}
+    <div class="row g-4">
+      {% for post in latest_posts %}
+      <div class="col-md-4 acd-reveal">
+        <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-reset d-block{% if post.is_urgent %} acd-urgent{% endif %}">
+          {% if post.is_urgent %}
+          <span class="acd-urgent-ribbon"><i class="bi bi-lightning-fill"></i> {% t "خبر فوری" %}</span>
+          {% endif %}
+          <div class="card acd-tile h-100 p-2">
+            <div class="card-body">
+              <span class="badge-trust mb-3 d-inline-flex"><i class="bi bi-dot"></i> {{ post.channel_label }}</span>
+              <h3 class="h6">{{ post.title }}</h3>
+              <p class="text-muted small mb-0 acd-clamp-2">{{ post.display_summary }}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="acd-empty-state acd-reveal">
+      <span class="acd-empty-icon"><i class="bi bi-stars"></i></span>
+      <p class="text-muted mb-0">
+        {% t "به محض انتشار اولین پست در ACDNews و ACDNotes، خلاصه‌ی آن‌ها همراه با لینک به همان صفحه اینجا نمایش داده می‌شود." %}
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

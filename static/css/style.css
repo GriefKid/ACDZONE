@@ -1,0 +1,2229 @@
+/*
+ * ACD Zone — design system
+ *
+ * PALETTE (v2, research-based — unchanged, do not re-tune the hues):
+ * Sources consulted: luxury-brand color guides (emerald+gold read as
+ * "prestige/rarity", the classic "forest green + gold + black" premium
+ * combo), travel/tourism site trends (warm neutral background + ONE
+ * saturated accent, teal/sand read as calm+adventure), fintech color
+ * psychology (green = growth/trust/"done"; red is strongly associated with
+ * caution/error in payment UI, so it should stay a small, sparing accent
+ * rather than a primary button color), and the standard 60/30/10
+ * dominant/secondary/accent ratio used across e-commerce.
+ *
+ * Applied ratio:
+ *   60% — warm cream/parchment (background, "quiet luxury" neutral)
+ *   30% — deep emerald (brand identity: header, footer, headings, links)
+ *   10% — antique gold (primary CTAs / buy buttons — reads premium,
+ *         not alarming, unlike red on a payment site)
+ *   accents (small, deliberate use only) — terracotta-red (the "red" from
+ *   the brief — heading underlines, tiny highlights) and deep teal
+ *   (travel/tourism flavor, used on ACDPay/ACDBallons trust badges).
+ *
+ * VISUAL LANGUAGE (v3, modernization pass):
+ * Researched 2026 web-design trends (glassmorphism / "liquid glass",
+ * bento grids, aurora/mesh-gradient backgrounds, functional micro-
+ * interactions, pill-shaped CTAs) and applied them on top of the SAME
+ * palette above — no hues changed, only how they're rendered: frosted
+ * glass surfaces, soft layered shadows instead of flat borders, gradient
+ * pill buttons with hover lift, drifting blurred gradient "aurora" blobs
+ * behind hero/section content, gradient icon chips, scroll-reveal
+ * animation and a scroll-aware glass header.
+ */
+
+:root {
+  --acd-emerald: #0b4f3c;
+  --acd-emerald-dark: #072e23;
+  --acd-emerald-light: #e7f2ed;
+  --acd-gold: #c6a15b;
+  --acd-gold-dark: #a8813f;
+  --acd-terracotta: #b3452c;
+  --acd-teal: #146b6b;
+  --acd-cream: #f8f3e9;
+  --acd-ink: #2a2520;
+
+  /* Layering / depth tokens */
+  --acd-shadow-sm: 0 2px 10px rgba(11, 79, 60, 0.08);
+  --acd-shadow-md: 0 10px 26px rgba(11, 79, 60, 0.14), 0 2px 8px rgba(11, 79, 60, 0.08);
+  --acd-shadow-lg: 0 22px 48px rgba(11, 79, 60, 0.20), 0 6px 18px rgba(11, 79, 60, 0.10);
+  --acd-shadow-gold: 0 10px 28px rgba(198, 161, 91, 0.4);
+  --acd-radius-sm: 0.75rem;
+  --acd-radius-md: 1.25rem;
+  --acd-radius-lg: 1.75rem;
+  --acd-glass-bg: rgba(255, 255, 255, 0.66);
+  --acd-glass-border: rgba(255, 255, 255, 0.55);
+  --acd-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Bootstrap 5.3 theme override — retints every stock Bootstrap component
+     (btn-outline-success, nav-pills active state, links, text-success, …)
+     so nothing on the site is left in Bootstrap's default blue/green. */
+  --bs-primary: var(--acd-emerald);
+  --bs-primary-rgb: 11, 79, 60;
+  --bs-success: var(--acd-emerald);
+  --bs-success-rgb: 11, 79, 60;
+  --bs-link-color: var(--acd-emerald);
+  --bs-link-color-rgb: 11, 79, 60;
+  --bs-link-hover-color: var(--acd-emerald-dark);
+  --bs-link-hover-color-rgb: 7, 46, 35;
+}
+
+html, body {
+  font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+  height: 100%;
+}
+
+/* Sticky-footer page shell. The header already pins itself to the
+   viewport top (position: sticky on .acd-header, below). This is the
+   footer's equivalent: body becomes a full-height flex column and
+   <main> is the one flexible child, so the footer always sits at the
+   bottom of the viewport on short pages (instead of floating wherever
+   the content happens to end) while still scrolling away normally, at
+   the bottom of the document, on tall pages. */
+body {
+  background-color: var(--acd-cream);
+  color: var(--acd-ink);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Custom scrollbar — small detail, reads intentional/modern rather than
+   left at browser default. */
+html {
+  scrollbar-color: var(--acd-emerald) var(--acd-cream);
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--acd-cream); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--acd-emerald), var(--acd-teal));
+  border-radius: 999px;
+  border: 2px solid var(--acd-cream);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--acd-emerald-dark); }
+
+/* Reduced motion — every animation/transition below is disabled here in
+   one place rather than repeated per-rule. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ==========================================================================
+   Header — frosted glass, scroll-aware
+   ========================================================================== */
+.acd-header {
+  background: rgba(7, 46, 35, 0.75);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(198, 161, 91, 0.22);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  transition: background-color 0.35s var(--acd-ease), box-shadow 0.35s var(--acd-ease), padding 0.35s var(--acd-ease);
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.acd-header.is-scrolled {
+  background: rgba(7, 46, 35, 0.94);
+  box-shadow: var(--acd-shadow-lg);
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
+
+.acd-header .navbar-brand img {
+  border-radius: 50%;
+  transition: transform 0.3s var(--acd-ease);
+}
+.acd-header .navbar-brand:hover img {
+  transform: rotate(-8deg) scale(1.05);
+}
+
+.acd-header .navbar-nav .nav-link {
+  position: relative;
+  font-weight: 500;
+  padding-inline: 0.85rem;
+}
+.acd-header .navbar-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.85rem;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--acd-gold);
+  transform: scaleX(0);
+  transition: transform 0.3s var(--acd-ease);
+}
+.acd-header .navbar-nav .nav-link:hover::after,
+.acd-header .navbar-nav .nav-link.active::after {
+  transform: scaleX(1);
+}
+
+.acd-header .btn-outline-light {
+  border-radius: 999px;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+  transition: transform 0.25s var(--acd-ease), background-color 0.25s var(--acd-ease), border-color 0.25s var(--acd-ease);
+}
+.acd-header .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.acd-header .acd-header-tools .btn-outline-light.acd-header-tool {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: rgba(255, 255, 255, 0.72);
+  padding-inline: 0.65rem;
+  font-weight: 500;
+}
+.acd-header .acd-header-tools .btn-outline-light.acd-header-tool:hover,
+.acd-header .acd-header-tools .btn-outline-light.acd-header-tool:focus {
+  background: transparent;
+  color: #fff;
+  transform: none;
+}
+.acd-header .acd-header-tools .dropdown-toggle::after,
+.acd-header .navbar-nav .dropdown-toggle::after {
+  margin-inline-start: 0.35rem;
+}
+
+.acd-avatar-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+  color: #241d0f;
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+/* Dropdown menus — used by country/language/profile menus */
+.dropdown-menu {
+  border: 1px solid rgba(11, 79, 60, 0.08);
+  border-radius: 1rem;
+  box-shadow: var(--acd-shadow-lg);
+  padding: 0.5rem;
+  margin-top: 0.6rem !important;
+}
+.dropdown-item {
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  transition: background-color 0.2s var(--acd-ease), color 0.2s var(--acd-ease);
+}
+
+/* Language switcher — faint national flag as a background, per request.
+   The flag sits on a ::before pseudo-element at low opacity so it never
+   fights with text legibility or the existing hover/active colors,
+   which paint on the real element underneath. */
+.acd-flag-option {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.acd-flag-option::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  z-index: -1;
+}
+.acd-flag-option.acd-flag-fa::before { background-image: url('../img/flag-fa.svg'); }
+.acd-flag-option.acd-flag-en::before { background-image: url('../img/flag-en.svg'); }
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: var(--acd-emerald-light);
+  color: var(--acd-emerald-dark);
+}
+
+.acd-representative-menu {
+  width: 290px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+.acd-rep-avatar-sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 0.65rem;
+  object-fit: cover;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.78), var(--acd-shadow-sm);
+}
+.acd-rep-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #241d0f;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+}
+.acd-rep-menu-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 68px;
+  margin-bottom: 0.35rem;
+  overflow: hidden;
+  border: 1px solid rgba(11, 79, 60, 0.09);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.74)),
+    var(--rep-country-bg);
+  background-size: cover;
+  background-position: center;
+}
+.acd-rep-menu-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(248, 243, 233, 0.56);
+  backdrop-filter: blur(1px);
+}
+.acd-rep-menu-card:hover,
+.acd-rep-menu-card:focus {
+  background:
+    linear-gradient(90deg, rgba(231, 242, 237, 0.95), rgba(255, 255, 255, 0.78)),
+    var(--rep-country-bg);
+  background-size: cover;
+  background-position: center;
+}
+.acd-rep-menu-media,
+.acd-rep-menu-text {
+  position: relative;
+  z-index: 1;
+}
+.acd-rep-menu-text {
+  min-width: 0;
+}
+.acd-rep-menu-name,
+.acd-rep-menu-country {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.acd-rep-menu-name {
+  color: var(--acd-ink);
+  font-weight: 800;
+}
+.acd-rep-menu-country {
+  color: rgba(42, 37, 32, 0.68);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Notification bell */
+.acd-notif-badge {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d1573a, var(--acd-terracotta));
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.15rem;
+  text-align: center;
+  box-shadow: 0 0 0 2px rgba(7, 46, 35, 0.75);
+}
+.acd-notif-menu {
+  width: 320px;
+  max-width: 90vw;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 0.4rem;
+}
+.acd-notif-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.6rem;
+  white-space: normal;
+}
+.acd-notif-item.acd-notif-unread {
+  background-color: var(--acd-emerald-light);
+  position: relative;
+  padding-inline-start: 1.15rem;
+}
+.acd-notif-item.acd-notif-unread::before {
+  content: "";
+  position: absolute;
+  top: 0.95rem;
+  inset-inline-start: 0.4rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--acd-terracotta);
+}
+.acd-notif-message {
+  font-size: 0.85rem;
+  color: var(--acd-ink);
+}
+.acd-notif-time {
+  font-size: 0.72rem;
+  color: var(--acd-ink);
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   Footer — deep gradient, gradient hairline, icon-chip social links
+   ========================================================================== */
+.acd-footer {
+  background: linear-gradient(180deg, var(--acd-emerald-dark), #051b14);
+  color: #f2efe9;
+  position: relative;
+}
+.acd-footer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--acd-teal), var(--acd-gold), var(--acd-terracotta));
+}
+.acd-footer a {
+  color: var(--acd-gold);
+  text-decoration: none;
+  transition: color 0.2s var(--acd-ease);
+}
+.acd-footer a:hover {
+  color: #ecd9ad;
+  text-decoration: underline;
+}
+.acd-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.acd-footer-top {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.acd-footer-tagline {
+  color: rgba(242, 239, 233, 0.65);
+  max-width: 420px;
+}
+.acd-footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f2efe9 !important;
+  text-decoration: none !important;
+  transition: transform 0.25s var(--acd-ease), background-color 0.25s var(--acd-ease), color 0.25s var(--acd-ease);
+}
+.acd-footer-social:hover {
+  background: var(--acd-gold);
+  color: var(--acd-emerald-dark) !important;
+  transform: translateY(-3px);
+}
+
+/* ==========================================================================
+   Buttons — pill-shaped, animated lift, gradient primary CTA
+   ========================================================================== */
+.btn {
+  border-radius: 999px;
+  transition: transform 0.25s var(--acd-ease), box-shadow 0.25s var(--acd-ease), background-color 0.25s var(--acd-ease), color 0.25s var(--acd-ease);
+}
+
+.btn-acd-primary {
+  background: linear-gradient(135deg, var(--acd-gold) 0%, var(--acd-gold-dark) 100%);
+  border: none;
+  color: #241d0f;
+  font-weight: 700;
+  padding: 0.6rem 1.7rem;
+  box-shadow: var(--acd-shadow-gold);
+}
+.btn-acd-primary:hover,
+.btn-acd-primary:focus {
+  background: linear-gradient(135deg, #d6b374 0%, var(--acd-gold) 100%);
+  color: #241d0f;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(198, 161, 91, 0.45);
+}
+.btn-acd-primary:active { transform: translateY(-1px); }
+
+.btn-outline-success:hover,
+.btn-outline-light:hover {
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Cards & tiles
+   ========================================================================== */
+.card {
+  border-radius: var(--acd-radius-md);
+  border: 1px solid rgba(11, 79, 60, 0.07);
+  box-shadow: var(--acd-shadow-sm);
+}
+
+/* .acd-tile = a card that behaves as a clickable/hoverable grid item
+   (dashboard shortcuts, product cards). Kept separate from plain .card
+   (forms, info panels) so hover-lift only appears where it means something. */
+.acd-tile {
+  transition: transform 0.35s var(--acd-ease), box-shadow 0.35s var(--acd-ease), border-color 0.35s var(--acd-ease);
+}
+.acd-tile:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--acd-shadow-lg);
+  border-color: rgba(198, 161, 91, 0.35);
+}
+
+.acd-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-teal));
+  color: #fff;
+  font-size: 1.6rem;
+  box-shadow: var(--acd-shadow-sm);
+  transition: transform 0.4s var(--acd-ease);
+}
+.acd-icon-chip--gold {
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+  color: #241d0f;
+}
+.acd-tile:hover .acd-icon-chip {
+  transform: scale(1.08) rotate(-6deg);
+}
+
+/* Decorative icon accent kept for any remaining bare-icon usage. */
+.acd-accent {
+  color: var(--acd-gold-dark);
+}
+
+/* Sparing "red" accent — the one explicitly requested in the brief.
+   Use only for small, deliberate highlights (badges, tags, underlines),
+   never as a button or large surface. */
+.acd-warm {
+  color: var(--acd-terracotta);
+}
+
+/* Small decorative underline under section titles */
+main section h2,
+main > .container > h1 {
+  position: relative;
+  padding-bottom: 0.65rem;
+}
+main section h2::after,
+main > .container > h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--acd-terracotta);
+}
+
+/* Trust badges (ACDPay / ACDBallons) — glass chip w/ icon roundel */
+.badge-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(20, 107, 107, 0.25);
+  color: var(--acd-teal);
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem 0.45rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(20, 107, 107, 0.07);
+  backdrop-filter: blur(6px);
+  transition: transform 0.25s var(--acd-ease), box-shadow 0.25s var(--acd-ease);
+}
+.badge-trust i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--acd-teal);
+  color: #fff;
+  font-size: 0.85rem;
+}
+.badge-trust:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--acd-shadow-sm);
+}
+
+/* ==========================================================================
+   Aurora / mesh-gradient decorative backgrounds
+   ========================================================================== */
+.acd-aurora {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.acd-aurora::before,
+.acd-aurora::after {
+  content: "";
+  position: absolute;
+  width: 46vw;
+  height: 46vw;
+  max-width: 620px;
+  max-height: 620px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  z-index: -1;
+  animation: acd-drift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.acd-aurora::before {
+  background: radial-gradient(circle, var(--acd-gold) 0%, transparent 70%);
+  top: -14%;
+  inset-inline-start: -12%;
+}
+.acd-aurora::after {
+  background: radial-gradient(circle, var(--acd-teal) 0%, transparent 70%);
+  bottom: -20%;
+  inset-inline-end: -10%;
+  animation-delay: -10s;
+}
+.acd-aurora-soft::before,
+.acd-aurora-soft::after {
+  opacity: 0.14;
+  filter: blur(95px);
+}
+@keyframes acd-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(3%, -4%) scale(1.08); }
+}
+
+/* Home hero */
+.acd-hero {
+  background: linear-gradient(135deg, var(--acd-emerald-dark), var(--acd-emerald) 75%);
+}
+
+/* Big faint brand watermark in the hero background — decorative only
+   (alt="" + aria-hidden in the template), sits behind hero content via
+   the negative z-index inside .acd-aurora's isolated stacking context. */
+.acd-hero-watermark {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: -8%;
+  transform: translateY(-50%);
+  width: 560px;
+  max-width: 60vw;
+  opacity: 0.08;
+  z-index: -1;
+  pointer-events: none;
+}
+.acd-gradient-text {
+  background: linear-gradient(120deg, #ffffff 0%, var(--acd-gold) 65%, var(--acd-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.01em;
+}
+
+.acd-section-alt {
+  background-color: #ffffff;
+}
+
+/* Media placeholders (video/photo slots) */
+.acd-media-placeholder {
+  background: linear-gradient(135deg, var(--acd-emerald-dark), var(--acd-emerald));
+  border: 1px solid rgba(198, 161, 91, 0.4);
+  box-shadow: var(--acd-shadow-md);
+}
+
+/* ==========================================================================
+   Home "products" carousel — the whole slide (image + caption) is one
+   clickable link straight into the product's page; the caption is an
+   overlay on the image itself (not a separate block below it), gradient
+   from transparent to dark so text stays readable over any photo.
+   ========================================================================== */
+.acd-product-carousel .carousel-item {
+  padding-bottom: 0.5rem;
+}
+
+.acd-slide-link {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  border-radius: var(--acd-radius-lg);
+}
+.acd-slide-link img {
+  transition: transform 0.6s var(--acd-ease);
+}
+.acd-slide-link:hover img {
+  transform: scale(1.05);
+}
+.acd-slide-link:hover .acd-slide-overlay {
+  padding-bottom: 2rem;
+}
+
+.acd-slide-overlay {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 3rem 1.75rem 1.5rem;
+  background: linear-gradient(0deg, rgba(7, 46, 35, 0.92) 0%, rgba(7, 46, 35, 0.55) 55%, rgba(7, 46, 35, 0) 100%);
+  color: #fff;
+  transition: padding 0.35s var(--acd-ease);
+}
+.acd-slide-overlay h3 {
+  color: #fff;
+}
+.acd-slide-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 620px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.acd-slide-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--acd-gold);
+}
+.acd-slide-link:hover .acd-slide-cta {
+  color: #fff;
+}
+
+.acd-product-carousel .carousel-control-prev,
+.acd-product-carousel .carousel-control-next {
+  width: 8%;
+  opacity: 1;
+}
+
+.acd-product-carousel .carousel-control-prev-icon,
+.acd-product-carousel .carousel-control-next-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  background-size: 50%;
+  border-radius: 50%;
+  transition: transform 0.25s var(--acd-ease), background-color 0.25s var(--acd-ease);
+}
+.acd-product-carousel .carousel-control-prev:hover .carousel-control-prev-icon,
+.acd-product-carousel .carousel-control-next:hover .carousel-control-next-icon {
+  transform: scale(1.12);
+  background-color: rgba(11, 79, 60, 0.85);
+}
+
+/* Per-product long-form copy (ACDPay/ACDBallons "how it works" section) */
+.acd-product-accordion .accordion-item {
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md) !important;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  background: var(--acd-glass-bg);
+}
+.acd-product-accordion .accordion-button {
+  font-weight: 700;
+  color: var(--acd-emerald-dark);
+  background: transparent;
+}
+.acd-product-accordion .accordion-button:not(.collapsed) {
+  color: var(--acd-emerald);
+  background: var(--acd-emerald-light);
+  box-shadow: none;
+}
+.acd-product-accordion .accordion-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(11, 79, 60, 0.15);
+}
+.acd-product-accordion .accordion-button::after {
+  filter: sepia(1) saturate(2) hue-rotate(90deg);
+}
+.acd-product-accordion .accordion-body {
+  color: var(--acd-ink);
+  line-height: 1.9;
+  font-size: 0.92rem;
+}
+
+/* ==========================================================================
+   Product cards (ACDPay / ACDBallons) — image bleeds edge-to-edge at the
+   top of the card with a floating price badge on top of it; the
+   description is clamped to two lines and the card body is a flex
+   column with the buy button pinned via margin-top: auto — so every
+   card in a row lines up on the same baseline no matter how long that
+   product's own title/description happens to be.
+   ========================================================================== */
+.acd-product-card {
+  overflow: hidden;
+}
+.acd-product-card .card-body {
+  display: flex;
+  flex-direction: column;
+}
+.acd-product-media {
+  position: relative;
+}
+.acd-product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--acd-ease);
+}
+.acd-product-card:hover .acd-product-media img {
+  transform: scale(1.08);
+}
+.acd-price-tag {
+  position: absolute;
+  top: 0.9rem;
+  inset-inline-start: 0.9rem;
+  background: linear-gradient(135deg, var(--acd-gold) 0%, var(--acd-gold-dark) 100%);
+  color: #241d0f;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  box-shadow: var(--acd-shadow-gold);
+  z-index: 1;
+}
+.acd-product-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
+}
+.acd-product-card .btn {
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   Empty states (news / notes / my products) — icon roundel instead of a
+   bare Bootstrap-Icons glyph, reads considerably less "default template".
+   ========================================================================== */
+.acd-empty-state {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+}
+.acd-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acd-emerald-light), #ffffff);
+  color: var(--acd-emerald);
+  font-size: 2rem;
+  box-shadow: var(--acd-shadow-sm);
+  margin-bottom: 1.25rem;
+}
+
+/* Category / filter pills (ACDNews) */
+.nav-pills .nav-link {
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--acd-emerald);
+  padding: 0.5rem 1.2rem;
+  transition: all 0.25s var(--acd-ease);
+}
+.nav-pills .nav-link:hover {
+  background-color: var(--acd-emerald-light);
+}
+.nav-pills .nav-link.active {
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  box-shadow: var(--acd-shadow-sm);
+}
+
+/* ==========================================================================
+   Order stepper — used two ways: (1) a plain preview list of stage labels
+   on the My Products empty state, and (2) a real order's progress on the
+   order detail page, where each .acd-step carries a --done/--current/
+   --pending status modifier reflecting how far that order has actually
+   gotten (see Order.get_stage_progress in apps/shop/models.py).
+   ========================================================================== */
+.acd-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto;
+  max-width: 100%;
+}
+.acd-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.4rem;
+  border-radius: 999px;
+  background: var(--acd-emerald-light);
+  margin: 0.25rem;
+}
+.acd-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--acd-emerald);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.acd-step-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--acd-emerald-dark);
+  white-space: nowrap;
+}
+
+/* Status modifiers — done (already passed), current (where the order is
+   right now), pending (still ahead). Plain .acd-step (no modifier, used by
+   the empty-state preview list) keeps looking like "current" always did. */
+.acd-step--done {
+  background: var(--acd-emerald-light);
+  opacity: 0.75;
+}
+.acd-step--done .acd-step-index {
+  background: var(--acd-emerald);
+  color: #fff;
+  font-size: 0.95rem;
+}
+.acd-step--current {
+  background: linear-gradient(135deg, var(--acd-gold) 0%, var(--acd-gold-dark) 100%);
+  box-shadow: var(--acd-shadow-gold);
+}
+.acd-step--current .acd-step-index {
+  background: #fff;
+  color: var(--acd-gold-dark);
+}
+.acd-step--current .acd-step-label {
+  color: #fff;
+}
+.acd-step--pending {
+  background: rgba(0, 0, 0, 0.05);
+}
+.acd-step--pending .acd-step-index {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--acd-ink);
+}
+.acd-step--pending .acd-step-label {
+  color: var(--acd-ink);
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   Forms — Bootstrap .form-control/.form-select classes are injected from
+   Python (see accounts/forms.py) so plain {% form.as_p %} rendering picks
+   these up automatically.
+   ========================================================================== */
+.form-control,
+.form-select {
+  border-radius: 1rem;
+  border: 1.5px solid rgba(11, 79, 60, 0.15);
+  padding: 0.65rem 1rem;
+  transition: border-color 0.25s var(--acd-ease), box-shadow 0.25s var(--acd-ease);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--acd-emerald);
+  box-shadow: 0 0 0 4px rgba(11, 79, 60, 0.12);
+}
+form p { margin-bottom: 1rem; }
+form label { font-weight: 600; margin-bottom: 0.35rem; display: inline-block; }
+
+/* Auth cards (login / signup) */
+.acd-auth-card {
+  border-radius: var(--acd-radius-lg);
+  box-shadow: var(--acd-shadow-lg);
+  border: 1px solid rgba(11, 79, 60, 0.06);
+  overflow: hidden;
+}
+.acd-auth-card .acd-auth-banner {
+  background: linear-gradient(135deg, var(--acd-emerald-dark), var(--acd-emerald));
+  padding: 1.75rem 2rem;
+  color: #fff;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Scroll-reveal utility (paired with static/js/main.js IntersectionObserver)
+   ========================================================================== */
+.acd-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s var(--acd-ease), transform 0.7s var(--acd-ease);
+}
+.acd-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Generic 2-line clamp — used by news cards and the notes timeline (kept
+   separate from .acd-product-desc, same rules, different call sites).
+   ========================================================================== */
+.acd-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   ACDNews — section badges, source/date meta, tag pills, article body.
+   ========================================================================== */
+.acd-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+/* Overlay modifier — positions the pill over a card's thumbnail image.
+   Kept separate from .acd-cat-pill itself so the same color classes below
+   also work standalone (inline, on an article detail page). */
+.acd-cat-badge {
+  position: absolute;
+  top: 0.9rem;
+  inset-inline-start: 0.9rem;
+  z-index: 1;
+}
+.acd-cat-sports { background: linear-gradient(135deg, var(--acd-teal), #0d4f4f); }
+.acd-cat-economy { background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark)); color: #241d0f; }
+.acd-cat-politics { background: linear-gradient(135deg, var(--acd-terracotta), #7e2f1c); }
+.acd-cat-society { background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark)); }
+
+.acd-news-card {
+  overflow: hidden;
+}
+.acd-news-media {
+  position: relative;
+}
+.acd-news-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--acd-ease);
+}
+.acd-news-card:hover .acd-news-media img {
+  transform: scale(1.08);
+}
+.acd-news-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--acd-teal);
+}
+.acd-news-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--acd-ink);
+  opacity: 0.6;
+}
+.acd-tag-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--acd-emerald-dark);
+  background: var(--acd-emerald-light);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+}
+
+/* Article detail pages (news_detail.html / notes_detail.html) */
+.acd-article-body {
+  line-height: 1.9;
+  font-size: 1.02rem;
+  color: var(--acd-ink);
+}
+.acd-article-body p {
+  margin-bottom: 1.1rem;
+}
+
+/* ==========================================================================
+   ACDNotes — vertical timeline. Each item draws its own dot + the
+   connector line down to the next item (hidden on the last one), rather
+   than one continuous line on the parent, so nothing depends on knowing
+   the list's total height up front.
+   ========================================================================== */
+.acd-timeline-item {
+  position: relative;
+  padding-inline-start: 2.75rem;
+  padding-bottom: 2.25rem;
+}
+.acd-timeline-item::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0.35rem;
+  top: 0.35rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+  box-shadow: 0 0 0 4px var(--acd-emerald-light), var(--acd-shadow-sm);
+  z-index: 1;
+}
+.acd-timeline-item::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  top: 1.25rem;
+  bottom: -1rem;
+  width: 2px;
+  background: linear-gradient(var(--acd-gold), rgba(198, 161, 91, 0.15));
+}
+.acd-timeline-item:last-child::after {
+  display: none;
+}
+.acd-timeline-card {
+  transition: transform 0.35s var(--acd-ease), box-shadow 0.35s var(--acd-ease), border-color 0.35s var(--acd-ease);
+}
+.acd-timeline-item:hover .acd-timeline-card {
+  transform: translateY(-4px);
+  box-shadow: var(--acd-shadow-lg);
+  border-color: rgba(198, 161, 91, 0.35);
+}
+
+/* ==========================================================================
+   Breaking / urgent posts (خبر فوری) — shared by ACDNews cards, ACDNotes
+   timeline items, and the homepage "latest posts" cards.
+
+   Applied to the <a> wrapper around each card, NOT the .card/.acd-news-card/
+   .acd-timeline-card itself: those already use overflow:hidden (image
+   zoom-on-hover clipping), and overflow:hidden also clips an element's OWN
+   box-shadow, not just overflowing children — a glow put directly on the
+   card would get silently cut off at its own edges. The <a> wrapper has no
+   overflow restriction, so the glow renders freely and the ribbon sits
+   cleanly at its corner.
+   ========================================================================== */
+.acd-urgent {
+  position: relative;
+  display: block;
+  border-radius: var(--acd-radius-md);
+  animation: acd-urgent-pulse 2.4s ease-in-out infinite;
+}
+@keyframes acd-urgent-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(179, 69, 44, 0); }
+  50% { box-shadow: 0 0 24px 4px rgba(179, 69, 44, 0.5); }
+}
+.acd-urgent-ribbon {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #d1573a, var(--acd-terracotta));
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(179, 69, 44, 0.5);
+  pointer-events: none;
+  animation: acd-urgent-ribbon-tilt 2.4s ease-in-out infinite;
+}
+@keyframes acd-urgent-ribbon-tilt {
+  0%, 100% { transform: rotate(-8deg) scale(1); }
+  50% { transform: rotate(-8deg) scale(1.08); }
+}
+
+/* Breaking-news filter pill (ACDNews) — same .nav-pills base as the four
+   category pills, red instead of emerald so it stands out even at rest,
+   not just when active. */
+.nav-pills .nav-link.acd-nav-link-urgent {
+  color: var(--acd-terracotta);
+}
+.nav-pills .nav-link.acd-nav-link-urgent:hover {
+  background-color: rgba(179, 69, 44, 0.12);
+}
+.nav-pills .nav-link.acd-nav-link-urgent.active {
+  background: linear-gradient(135deg, #d1573a, var(--acd-terracotta));
+}
+
+/* ==========================================================================
+   ACDSupport — ticket status pills + chat-style message thread.
+   ========================================================================== */
+.acd-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.acd-status-open {
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+  color: #241d0f;
+}
+.acd-status-answered {
+  background: linear-gradient(135deg, var(--acd-teal), #0d4f4f);
+  color: #fff;
+}
+.acd-status-closed {
+  background: var(--acd-cream);
+  color: var(--acd-ink);
+  opacity: 0.75;
+  border: 1px solid rgba(42, 37, 32, 0.15);
+}
+
+/* Chat thread — own messages align to the end of the row (right in RTL,
+   left in LTR) filled in emerald; staff replies align to the start,
+   plain cards with a gold hairline. Alignment uses justify-content on a
+   flex row rather than float/margin tricks, so it's correct in both
+   directions automatically since the site's Bootstrap build is RTL. */
+.acd-ticket-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.acd-ticket-row {
+  display: flex;
+}
+.acd-ticket-row.acd-bubble-end {
+  justify-content: flex-end;
+}
+.acd-ticket-row.acd-bubble-start {
+  justify-content: flex-start;
+}
+.acd-ticket-bubble {
+  max-width: 80%;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--acd-radius-md);
+  box-shadow: var(--acd-shadow-sm);
+}
+.acd-ticket-bubble-user {
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  color: #fff;
+}
+.acd-ticket-bubble-staff {
+  background: #fff;
+  border: 1px solid rgba(198, 161, 91, 0.35);
+  color: var(--acd-ink);
+}
+.acd-ticket-bubble-sender {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+.acd-ticket-bubble-body p {
+  margin-bottom: 0.5rem;
+}
+.acd-ticket-bubble-body p:last-child {
+  margin-bottom: 0;
+}
+.acd-ticket-bubble-meta {
+  display: block;
+  font-size: 0.7rem;
+  opacity: 0.65;
+  margin-top: 0.35rem;
+}
+
+/* ==========================================================================
+   Floating chat widget — "chat with admin" (apps.support Conversation /
+   ChatMessage). Bottom-right is a deliberate literal/physical position,
+   unlike the inset-inline-* logical properties used everywhere else in
+   this file for RTL correctness: a floating widget conventionally stays
+   anchored to the same screen corner regardless of text direction.
+
+   For the same reason, .acd-chat-panel below pins its position with
+   plain absolute/top/bottom/left/right rather than Bootstrap's logical
+   dropdown-menu-end class — that class (and Popper, which the toggle's
+   data-bs-display="static" attribute disables) bases "end" on the live
+   page direction, which flips between fa (rtl) and en (ltr). This panel
+   must open the same physical way — up and to the left of the button —
+   in both languages, so it's pinned explicitly instead.
+   ========================================================================== */
+.acd-chat-widget {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1030; /* Bootstrap's own "fixed element" tier: above the
+                    sticky header (1020), below modals (1050+) */
+}
+
+.acd-chat-fab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: var(--acd-shadow-lg);
+  transition: transform 0.25s var(--acd-ease), box-shadow 0.25s var(--acd-ease);
+}
+.acd-chat-fab:hover,
+.acd-chat-fab:focus {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(11, 79, 60, 0.35);
+  color: #fff;
+}
+.acd-chat-fab:active { transform: translateY(-1px); }
+
+/* Reuses .acd-notif-badge's shape/gradient/font wholesale (same visual
+   language as the header bell badge); only the position needs
+   adjusting for this bigger, circular button. */
+.acd-chat-badge {
+  top: -2px;
+  inset-inline-end: -2px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.acd-chat-panel {
+  position: absolute !important;
+  top: auto !important;
+  bottom: calc(100% + 0.75rem) !important;
+  left: auto !important;
+  right: 0 !important;
+  transform: none !important;
+  margin: 0 !important;
+  width: 340px;
+  max-width: calc(100vw - 2rem);
+  padding: 0;
+  border: none;
+  border-radius: var(--acd-radius-lg);
+  box-shadow: var(--acd-shadow-lg);
+  overflow: hidden;
+}
+
+.acd-chat-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 0.9rem 1.1rem;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  color: #fff;
+  font-weight: 700;
+}
+
+.acd-chat-error {
+  border-radius: 0;
+  margin: 0;
+}
+
+.acd-chat-thread {
+  height: 320px;
+  max-height: 45vh;
+  overflow-y: auto;
+  padding: 1rem;
+  background: var(--acd-cream);
+}
+.acd-chat-empty {
+  padding: 1.75rem 1rem;
+}
+.acd-chat-empty .acd-empty-icon {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+#acd-chat-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Same alignment technique as .acd-ticket-row: justify-content on a flex
+   row, so "own message" correctly lands on the end side in both
+   directions — this one's fine to stay logical/RTL-aware since it's
+   about reading order inside the thread, not the widget's screen
+   position. */
+.acd-chat-row {
+  display: flex;
+}
+.acd-chat-row-end {
+  justify-content: flex-end;
+}
+.acd-chat-row-start {
+  justify-content: flex-start;
+}
+.acd-chat-bubble {
+  max-width: 85%;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--acd-radius-md);
+  box-shadow: var(--acd-shadow-sm);
+}
+.acd-chat-bubble-user {
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  color: #fff;
+}
+.acd-chat-bubble-staff {
+  background: #fff;
+  border: 1px solid rgba(198, 161, 91, 0.35);
+  color: var(--acd-ink);
+}
+.acd-chat-bubble-sender {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+  margin-bottom: 0.2rem;
+}
+.acd-chat-bubble-body {
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.acd-chat-bubble-meta {
+  display: block;
+  font-size: 0.65rem;
+  opacity: 0.65;
+  margin-top: 0.3rem;
+}
+
+.acd-chat-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #fff;
+  border-top: 1px solid rgba(11, 79, 60, 0.1);
+}
+.acd-chat-input.form-control {
+  flex: 1;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+}
+.acd-chat-send {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  color: #fff;
+  transition: transform 0.2s var(--acd-ease), box-shadow 0.2s var(--acd-ease);
+}
+.acd-chat-send:hover,
+.acd-chat-send:focus {
+  transform: translateY(-2px);
+  box-shadow: var(--acd-shadow-sm);
+  color: #fff;
+}
+.acd-chat-send:disabled {
+  opacity: 0.6;
+  transform: none;
+  cursor: not-allowed;
+}
+
+@media (max-width: 576px) {
+  .acd-chat-widget {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  .acd-chat-panel {
+    width: calc(100vw - 2rem);
+  }
+  .acd-chat-thread {
+    height: 50vh;
+  }
+}
+
+/* ==========================================================================
+   Country selector (header dropdown) + country detail page
+   (templates/core/country_detail.html)
+   ========================================================================== */
+
+/* Small flag next to each country's name in the header dropdown. */
+.acd-country-flag-sm {
+  width: 22px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+/* Admin can add as many countries as they like — scrolls instead of
+   pushing the dropdown off-screen once the list gets long. */
+.acd-country-menu {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+/* Country page hero: country's own background photo (inline style, since
+   it's per-row admin data) with a flag + name caption anchored to the
+   bottom — same gradient direction/opacity and emerald fallback color as
+   the home carousel's .acd-slide-overlay / .acd-media-placeholder, so a
+   country with no background image yet still looks intentional rather
+   than broken. */
+.acd-country-hero {
+  position: relative;
+  min-height: 320px;
+  background-color: var(--acd-emerald-dark);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  border-radius: 0 0 var(--acd-radius-lg) var(--acd-radius-lg);
+}
+.acd-country-hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(0deg, rgba(7, 46, 35, 0.9) 0%, rgba(7, 46, 35, 0.45) 55%, rgba(7, 46, 35, 0.1) 100%);
+}
+.acd-country-hero-overlay .container {
+  width: 100%;
+}
+.acd-country-flag-lg {
+  width: 64px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: var(--acd-radius-sm);
+  box-shadow: var(--acd-shadow-md);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+}
+.acd-country-anthem audio {
+  border-radius: 999px;
+}
+
+/* ==========================================================================
+   Representative profile page (templates/core/representative_detail.html)
+   ========================================================================== */
+.acd-rep-hero {
+  position: relative;
+  min-height: 410px;
+  background-color: var(--acd-emerald-dark);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  border-radius: 0 0 var(--acd-radius-lg) var(--acd-radius-lg);
+}
+.acd-rep-hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  background:
+    linear-gradient(0deg, rgba(7, 46, 35, 0.94) 0%, rgba(7, 46, 35, 0.62) 48%, rgba(7, 46, 35, 0.18) 100%);
+}
+.acd-rep-hero-overlay .container {
+  width: 100%;
+}
+.acd-rep-hero-copy {
+  width: min(720px, 100%);
+  padding: clamp(1.35rem, 3vw, 2.15rem);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: var(--acd-radius-lg);
+  background: linear-gradient(135deg, rgba(7, 46, 35, 0.76), rgba(7, 46, 35, 0.5));
+  box-shadow: var(--acd-shadow-lg);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+.acd-rep-photo-fallback {
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+  color: #241d0f;
+  font-weight: 800;
+}
+.acd-rep-country {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.acd-rep-main-grid {
+  direction: ltr;
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+.acd-rep-main-grid > * {
+  direction: ltr;
+}
+html[dir="rtl"] .acd-rep-main-grid > * {
+  direction: rtl;
+}
+.acd-rep-photo-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md);
+  box-shadow: var(--acd-shadow-md);
+  backdrop-filter: blur(14px);
+  padding: 0.7rem;
+  min-height: 320px;
+}
+.acd-rep-main-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  border-radius: calc(var(--acd-radius-md) - 0.4rem);
+  object-fit: cover;
+  object-position: center top;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+}
+.acd-rep-contact-card,
+.acd-rep-story {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md);
+  box-shadow: var(--acd-shadow-md);
+  backdrop-filter: blur(14px);
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+.acd-rep-story {
+  grid-column: 1 / -1;
+}
+.acd-rep-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  padding: 0.85rem 0;
+  color: var(--acd-ink);
+  text-decoration: none;
+  border-top: 1px solid rgba(11, 79, 60, 0.1);
+}
+.acd-rep-contact-item:first-of-type {
+  border-top: 0;
+}
+.acd-rep-contact-link:hover {
+  color: var(--acd-emerald);
+}
+.acd-rep-contact-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 50%;
+  background: var(--acd-emerald-light);
+  color: var(--acd-emerald);
+  flex: 0 0 auto;
+}
+
+@media (max-width: 576px) {
+  .acd-rep-hero-copy {
+    text-align: center;
+  }
+  .acd-rep-hero-copy .d-flex {
+    justify-content: center;
+  }
+  .acd-rep-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .acd-rep-photo-card {
+    min-height: 260px;
+  }
+  .acd-rep-main-photo {
+    min-height: 240px;
+  }
+}
+
+/* ==========================================================================
+   Auth-required modal (templates/partials/auth_required_modal.html) — shown
+   to signed-out visitors instead of an immediate redirect when they click
+   "خرید" on ACDPay/ACDBallons. Bootstrap already gives the modal its
+   fade+scale entrance (~300ms, inside the 150–300ms micro-interaction
+   window) and focus trap/backdrop/Escape handling for free; everything
+   here is purely the on-brand visual polish layer on top of that.
+   ========================================================================== */
+.acd-auth-modal {
+  border: none;
+  border-radius: var(--acd-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--acd-shadow-lg);
+}
+/* Same three-tone accent line used on the footer — ties this dialog back
+   to the rest of the site instead of reading as a bare stock Bootstrap
+   modal. */
+.acd-auth-modal::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, var(--acd-teal), var(--acd-gold), var(--acd-terracotta));
+}
+.acd-auth-modal-close {
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  inset-block-start: 0.9rem;
+  /* .btn-close's own glyph is small by design — pad the hit area out to
+     the 44×44 touch-target minimum without inflating the visible icon. */
+  padding: 0.85rem;
+  z-index: 1;
+}
+.acd-auth-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-emerald-dark));
+  color: var(--acd-gold);
+  font-size: 1.9rem;
+  box-shadow: var(--acd-shadow-md);
+  animation: acd-auth-icon-pop 0.35s var(--acd-ease);
+}
+/* Re-plays every time the modal opens: Bootstrap adds/removes .show on
+   each open/close cycle, and a CSS animation restarts whenever the rule
+   that declares it goes from not-applying to applying again. */
+.modal.show .acd-auth-modal-icon {
+  animation: acd-auth-icon-pop 0.35s var(--acd-ease);
+}
+@keyframes acd-auth-icon-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+.acd-auth-modal-signup {
+  color: var(--acd-emerald);
+  font-weight: 600;
+  text-decoration: none;
+}
+.acd-auth-modal-signup:hover,
+.acd-auth-modal-signup:focus {
+  color: var(--acd-emerald-dark);
+  text-decoration: underline;
+}
+@media (prefers-reduced-motion: reduce) {
+  .acd-auth-modal-icon,
+  .modal.show .acd-auth-modal-icon {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Welcome mascot (templates/partials/welcome_mascot.html) — a permanent
+   tiger-cub companion shown on every page, to every visitor, pointing at
+   "داشبورد". Anchored to the opposite physical corner from the chat
+   widget (bottom-left vs. its bottom-right) so the two floating elements
+   never collide; same reasoning as .acd-chat-widget for why this uses a
+   literal left/right instead of the inset-inline-* logical properties
+   used elsewhere — a floating mascot should stay in the same screen
+   corner regardless of language direction.
+   ========================================================================== */
+.acd-mascot-widget {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 1025; /* same "fixed element" tier as .acd-chat-widget (1030),
+                    just under it; both stay below modals (1050+) */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  /* Entrance: starts invisible; static/js/main.js adds .is-visible
+     shortly after each page load, and this transition carries it in.
+     Kept out of the initial paint entirely via opacity+translate rather
+     than display:none, so the transition has something to animate from. */
+  opacity: 0;
+  transform: translateY(24px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.45s var(--acd-ease), transform 0.45s var(--acd-ease);
+}
+.acd-mascot-widget.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.acd-mascot-svg {
+  width: 92px;
+  height: auto;
+  filter: drop-shadow(0 8px 16px rgba(11, 79, 60, 0.25));
+}
+.acd-mascot-shadow {
+  fill: rgba(11, 79, 60, 0.18);
+}
+
+/* Idle wave loop — only once the entrance transition has finished
+   (.is-visible), so the arm doesn't fight the entrance transform. */
+.acd-mascot-widget.is-visible .acd-mascot-arm-wave {
+  transform-box: fill-box;
+  transform-origin: 85% 12%;
+  animation: acd-mascot-wave 1.1s ease-in-out 0.5s 3;
+}
+@keyframes acd-mascot-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-22deg); }
+  50% { transform: rotate(-4deg); }
+  75% { transform: rotate(-18deg); }
+}
+
+.acd-mascot-bubble {
+  position: relative;
+  max-width: 230px;
+  background: #ffffff;
+  border-radius: var(--acd-radius-md);
+  box-shadow: var(--acd-shadow-lg);
+  padding: 0.9rem 1rem;
+  order: -1; /* bubble above the tiger, closer to the dashboard nav link */
+}
+/* Speech-bubble tail, pointing down at the tiger beneath it. */
+.acd-mascot-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 28px;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  border-radius: 0 0 0 4px;
+}
+.acd-mascot-text {
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+  color: var(--acd-ink);
+}
+/* 44×44 minimum touch target (a bare visible circle that size would
+   overwhelm a 230px bubble), so the button itself is the full invisible
+   hit area and only the inner icon badge is drawn small — same trick
+   used for .acd-auth-modal-close. */
+.acd-mascot-close {
+  position: absolute;
+  inset-inline-end: -0.35rem;
+  inset-block-start: -0.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.acd-mascot-close i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--acd-emerald-light);
+  color: var(--acd-emerald-dark);
+  font-size: 0.7rem;
+  transition: background-color 0.2s var(--acd-ease), color 0.2s var(--acd-ease);
+}
+.acd-mascot-close:hover i {
+  background: var(--acd-emerald);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acd-mascot-widget {
+    transition: opacity 0.2s linear;
+  }
+  .acd-mascot-widget.is-visible .acd-mascot-arm-wave {
+    animation: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .acd-mascot-widget {
+    left: 0.75rem;
+    bottom: 0.75rem;
+  }
+  .acd-mascot-svg {
+    width: 72px;
+  }
+  .acd-mascot-bubble {
+    max-width: 190px;
+  }
+}
+
+/* ==========================================================================
+   Country page extras accordion (templates/core/country_detail.html) —
+   attractions grid + travel-route calculator, both collapsed by default so
+   the page doesn't feel overloaded (see country_detail.html's own comment
+   for why everything still renders in the DOM up front).
+   ========================================================================== */
+.acd-country-accordion .accordion-item {
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md) !important;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+  background: var(--acd-glass-bg);
+  backdrop-filter: blur(10px);
+}
+.acd-country-accordion .accordion-button {
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--acd-emerald-dark);
+  background: transparent;
+}
+.acd-country-accordion .accordion-button:not(.collapsed) {
+  color: var(--acd-emerald);
+  background: var(--acd-emerald-light);
+  box-shadow: none;
+}
+.acd-country-accordion .accordion-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(11, 79, 60, 0.15);
+}
+.acd-country-accordion .accordion-button::after {
+  filter: sepia(1) saturate(2) hue-rotate(90deg);
+}
+.acd-country-accordion .accordion-body {
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+/* Small pill badge showing a count next to an accordion header
+   (e.g. number of attractions) — reuses the gold gradient language from
+   .acd-price-tag/.acd-notif-badge rather than a plain Bootstrap badge. */
+.acd-count-badge {
+  background: linear-gradient(135deg, var(--acd-gold), var(--acd-gold-dark));
+  color: #241d0f;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.25em 0.65em;
+  font-size: 0.72rem;
+  vertical-align: middle;
+}
+
+/* Attraction card image container — the same rounded-top treatment used
+   by .acd-product-media's cards, added here explicitly since Bootstrap
+   5.3 has no built-in "rounded-top-4" utility (only -1..-3 ship by
+   default); this class covers that gap for any ratio/media wrapper that
+   needs to match the card's own border-radius on just its top corners. */
+.rounded-top-4 {
+  border-top-left-radius: var(--acd-radius-md) !important;
+  border-top-right-radius: var(--acd-radius-md) !important;
+}
+
+/* Travel-route calculator (JS-populated result, static/js/main.js) */
+.acd-route-calc .form-label {
+  color: var(--acd-emerald-dark);
+}
+.acd-route-result {
+  border-radius: var(--acd-radius-md);
+  padding: 1.1rem 1.35rem;
+  background: linear-gradient(135deg, var(--acd-emerald-light), #ffffff);
+  border: 1px solid rgba(11, 79, 60, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.acd-route-result-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-teal));
+  color: #fff;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.acd-route-result-distance {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--acd-emerald-dark);
+}
+.acd-route-result-duration {
+  font-size: 0.85rem;
+  color: var(--acd-ink);
+  opacity: 0.75;
+}
+.acd-route-result-notes {
+  font-size: 0.85rem;
+  color: var(--acd-ink);
+  opacity: 0.85;
+  margin-top: 0.35rem;
+}
+.acd-route-estimate-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #c0392b;
+  background: rgba(192, 57, 43, 0.1);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  vertical-align: middle;
+}
+.acd-route-result--empty {
+  background: var(--acd-cream);
+  border: 1px dashed rgba(42, 37, 32, 0.25);
+  color: var(--acd-ink);
+  opacity: 0.75;
+  font-size: 0.9rem;
+  justify-content: center;
+}
+
+/* Quick-facts strip ("کشور در یک نگاه") at the top of a country page —
+   a row of small pill-cards, one per fact, wraps naturally on mobile. */
+.acd-quickfacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.acd-quickfact {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1 1 200px;
+  padding: 0.75rem 1rem;
+  border-radius: var(--acd-radius-md);
+  background: var(--acd-glass-bg);
+  border: 1px solid var(--acd-glass-border);
+  backdrop-filter: blur(8px);
+}
+.acd-quickfact-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acd-emerald), var(--acd-teal));
+  color: #fff;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+.acd-quickfact-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--acd-ink);
+  opacity: 0.6;
+}
+.acd-quickfact-value {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--acd-emerald-dark);
+}
+
+/* Attraction detail page hero — reuses .acd-country-hero's exact frame,
+   just a shorter min-height since there's no flag/anthem block competing
+   for space above the description. */
+.acd-attraction-hero {
+  min-height: 300px;
+}
+.acd-attraction-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.acd-attraction-back:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Hotel cards (country page "هتل‌های معروف" accordion) — same .acd-tile
+   card base as attractions, just with a star-rating chip floating over
+   the photo (reuses .acd-price-tag's positioning idea, gold gradient
+   swapped for a dark glass chip since a star count isn't a price). */
+.acd-hotel-stars {
+  position: absolute;
+  top: 0.75rem;
+  inset-inline-end: 0.75rem;
+  z-index: 1;
+  background: rgba(7, 46, 35, 0.72);
+  backdrop-filter: blur(6px);
+  color: var(--acd-gold);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  box-shadow: var(--acd-shadow-sm);
+}
+.acd-hotel-city {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--acd-teal);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.acd-hotel-stars-inline {
+  color: var(--acd-gold);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.acd-hotel-phone-link {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.acd-hotel-phone-link:hover {
+  color: var(--acd-emerald-dark);
+}
+.acd-hotel-map iframe {
+  border-radius: var(--acd-radius-md);
+  box-shadow: var(--acd-shadow-sm);
+}
+.acd-chart-wrap {
+  background: var(--acd-glass-bg);
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md);
+  padding: 1rem;
+  position: relative;
+  height: 260px;
+  width: 100%;
+}
+.acd-chart-wrap canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Pure-CSS bar chart for country currency values (templates/core/country_detail.html).
+   Replaces a Chart.js/cdnjs canvas that rendered blank for visitors whose
+   network filters that CDN — these bars need zero JavaScript and zero
+   external requests, so they can't fail the same way. */
+.acd-css-chart {
+  background: var(--acd-glass-bg);
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md);
+  padding: 1.25rem 1.25rem 1rem;
+}
+.acd-css-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.acd-css-bar-row:last-child {
+  margin-bottom: 0;
+}
+.acd-css-bar-label {
+  flex: 0 0 64px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--acd-emerald-dark);
+  text-align: end;
+}
+.acd-css-bar-track {
+  flex: 1 1 auto;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  height: 28px;
+  overflow: hidden;
+  position: relative;
+}
+.acd-css-bar-fill {
+  height: 100%;
+  min-width: 2.5rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-inline-end: 0.6rem;
+  transition: width 0.6s ease;
+}
+.acd-css-bar-fill--local {
+  background: linear-gradient(90deg, var(--acd-emerald, #0f6f4e), var(--acd-emerald-dark, #0a5138));
+}
+.acd-css-bar-fill--toman {
+  background: linear-gradient(90deg, #c0392b, #922b21);
+}
+.acd-css-bar-value {
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Seasonal weather cards on the country page (templates/core/country_detail.html). */
+.acd-weather-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.acd-weather-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--acd-glass-bg);
+  border: 1px solid var(--acd-glass-border);
+  border-radius: var(--acd-radius-md);
+  padding: 1rem;
+  border-inline-start: 4px solid transparent;
+}
+.acd-weather-card--spring { border-inline-start-color: #6bbf59; }
+.acd-weather-card--summer { border-inline-start-color: #e8a13a; }
+.acd-weather-card--autumn { border-inline-start-color: #c0392b; }
+.acd-weather-card--winter { border-inline-start-color: #3b8fc9; }
+.acd-weather-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+  font-size: 1.1rem;
+  color: var(--acd-emerald-dark);
+}
+.acd-weather-season {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: var(--acd-emerald-dark);
+}
+.acd-weather-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--acd-text-muted, #666);
+  line-height: 1.6;
+}

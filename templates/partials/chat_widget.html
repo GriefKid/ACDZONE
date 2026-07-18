@@ -1,0 +1,67 @@
+{% load static acd_i18n %}
+{% if user.is_authenticated %}
+<!-- Floating "chat with admin" widget — visible on every page (included
+     from base.html) for any logged-in user. "Admin" is defined exactly
+     as the user asked: whoever can access the Django admin panel
+     (is_staff=True). There is no admin-facing version of this widget —
+     staff read and reply from /admin/ (apps/support/admin.py's
+     ConversationAdmin + ChatMessageInline), exactly like the ACDSupport
+     ticket system. See apps/support/models.py Conversation/ChatMessage
+     docstrings and apps/support/views.py's chat_* views for the backend.
+
+     Position is intentionally physical (bottom/right in CSS), not
+     logical/RTL-aware — a floating widget conventionally stays anchored
+     to the same screen corner regardless of text direction. -->
+<div class="acd-chat-widget" id="acd-chat-widget"
+     data-messages-url="{% url 'support:chat_messages' %}"
+     data-send-url="{% url 'support:chat_send' %}"
+     data-unread-url="{% url 'support:chat_unread_count' %}"
+     data-error-text="{% t 'ارسال پیام با خطا مواجه شد. دوباره تلاش کنید.' %}">
+
+  <div class="dropup">
+    <button class="acd-chat-fab" type="button" id="acd-chat-toggle"
+            data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bs-display="static"
+            aria-expanded="false" aria-label="{% t 'چت با پشتیبانی' %}">
+      <i class="bi bi-headset"></i>
+      <!-- Server-rendered initial count from apps/core/context_processors.py
+           so there's no flash-of-empty-badge before chat-widget.js's first
+           poll resolves; the JS keeps it live from here on. -->
+      <span class="acd-notif-badge acd-chat-badge{% if not unread_chat_count %} d-none{% endif %}" id="acd-chat-badge">{{ unread_chat_count|default:0 }}</span>
+    </button>
+
+    <!-- data-bs-display="static" above disables Popper for this dropdown
+         on purpose: Popper (and Bootstrap's own dropdown-menu-end class)
+         positions the menu based on the page's live text direction, which
+         flips between fa (rtl) and en (ltr) — but this widget is pinned
+         to a literal screen corner regardless of language, so the panel
+         must open in the same physical direction (up and to the left of
+         the button) in both languages. .acd-chat-panel in style.css
+         pins that position explicitly with plain absolute/bottom/right,
+         sidestepping Bootstrap's LTR/RTL-aware placement entirely. -->
+    <div class="dropdown-menu acd-chat-panel" aria-labelledby="acd-chat-toggle">
+      <div class="acd-chat-panel-header">
+        <i class="bi bi-headset me-2"></i>{% t "چت با پشتیبانی" %}
+      </div>
+
+      <div class="acd-chat-error alert alert-danger py-2 px-3 small mb-0 d-none" id="acd-chat-error" role="alert"></div>
+
+      <div class="acd-chat-thread" id="acd-chat-thread">
+        <div class="acd-empty-state acd-chat-empty" id="acd-chat-empty">
+          <span class="acd-empty-icon"><i class="bi bi-chat-dots"></i></span>
+          <p class="text-muted small mb-0">{% t "هنوز پیامی وجود ندارد. اولین پیام خود را بفرستید." %}</p>
+        </div>
+        <div id="acd-chat-messages-list"></div>
+      </div>
+
+      <form class="acd-chat-form" id="acd-chat-form" autocomplete="off">
+        <input type="text" class="form-control acd-chat-input" id="acd-chat-input" maxlength="1000"
+               placeholder="{% t 'پیام خود را بنویسید…' %}" aria-label="{% t 'پیام' %}">
+        <button type="submit" class="acd-chat-send" id="acd-chat-send" aria-label="{% t 'ارسال' %}">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="{% static 'js/chat-widget.js' %}"></script>
+{% endif %}

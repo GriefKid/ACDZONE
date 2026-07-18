@@ -1,0 +1,147 @@
+/*
+ * ACD Zone — admin panel overrides (django-unfold)
+ *
+ * Loaded AFTER unfold's own compiled Tailwind bundle (see UNFOLD['STYLES']
+ * in settings.py + the {% block extrastyle %} placement in
+ * unfold/layouts/skeleton.html — our file is injected as an extra <link>,
+ * and Unfold's own styles.css can still land after it in some views, so
+ * !important is used deliberately wherever we're overriding a Tailwind
+ * utility class that's applied directly on an element (a directly-applied
+ * class always wins over inheritance regardless of source order, and
+ * source order alone isn't reliable here either) — not sloppiness.
+ *
+ * Two unrelated fixes live in this one file because both only apply to
+ * the admin theme:
+ *   1) RTL text alignment (Unfold ships zero `rtl:` Tailwind variants —
+ *      confirmed by grepping the compiled CSS — so `dir="rtl"` on <html>
+ *      correctly mirrors overall page direction but does NOT fix the
+ *      handful of templates that hardcode `class="text-left"`, e.g.
+ *      unfold/templates/admin/change_list_headers.html's column headers
+ *      and admin/change_list_results.html's row cells).
+ *   2) Green-primary / red-on-hover interaction color, on top of the
+ *      already-correct green primary ramp from settings.py.
+ */
+
+
+/* ------------------------------------------------------------------
+ * 1) RTL text alignment
+ * Scoped under [dir="rtl"] so the English admin view (dir="ltr") is
+ * completely untouched.
+ * ------------------------------------------------------------------ */
+
+/* Baseline: body text (paragraphs, help text, plain labels, etc. that
+   don't carry an explicit alignment utility) inherits right-alignment
+   from here — CSS's initial text-align is "start", which already means
+   "right" once dir=rtl, but we set it explicitly rather than lean on
+   that default so this doesn't silently regress if Unfold's base
+   stylesheet ever sets its own default. */
+[dir="rtl"] body {
+    text-align: right;
+}
+
+/* The actual bug: several bundled Unfold templates hardcode Tailwind's
+   `text-left` utility directly on the element (change list column
+   headers, table cells, object-history rows, tab labels, and others —
+   17 template files use it in total). A directly-applied class always
+   wins over inherited text-align, so the body-level rule above can't
+   reach these on its own. */
+[dir="rtl"] .text-left {
+    text-align: right !important;
+}
+
+/* Form fields: belt-and-suspenders so typed Persian content (post
+   bodies, titles, tags, etc.) is right-aligned while typing, regardless
+   of any browser-specific default handling of dir-inheritance on
+   form controls. */
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+    text-align: right;
+}
+
+/* django-modeltranslation renders the fa/en tabbed field pairs; the tab
+   labels themselves should read right-to-left too. */
+[dir="rtl"] .object-tools,
+[dir="rtl"] .help,
+[dir="rtl"] label {
+    text-align: right;
+}
+
+
+/* ------------------------------------------------------------------
+ * 2) Green primary, red on hover
+ * Unfold's Tailwind utilities (bg-primary-600, hover:text-primary-600,
+ * etc.) all resolve through CSS custom properties set once on :root in
+ * unfold/layouts/skeleton.html — --color-primary-500/600/700 in
+ * particular are the shades used for hover/interactive states. Instead
+ * of hunting down every hover: utility class across Unfold's templates
+ * individually, we re-point those three shades to our terracotta red
+ * ONLY while the interactive element itself is hovered — the resting
+ * state (green, from settings.py's COLORS.primary) is untouched, so the
+ * admin stays mostly green and flips to red purely as hover feedback.
+ *
+ * Terracotta (#b3452c / rgb(179 69 44)) reuses the exact "red" the
+ * public site already settled on (static/css/style.css --acd-terracotta)
+ * instead of a pure stop-sign red — see that file's palette comment:
+ * pure red reads as "error" on a payment site, so the public pages only
+ * ever use it as a small accent. Same reasoning applies to the admin.
+ * If you'd rather have a punchier red, swap the three values below.
+ */
+a:hover,
+button:hover,
+h2:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    --color-primary-500: 179 69 44;
+    --color-primary-600: 179 69 44;
+    --color-primary-700: 179 69 44;
+}
+
+/* Tailwind's `danger` button variant (Delete) already uses its own
+   built-in red-600/700 scale, completely separate from --color-primary-*,
+   so it's unaffected by the override above — it was already red and
+   stays exactly as red as before. */
+
+
+/* ------------------------------------------------------------------
+ * 3) Sidebar: solid green background like the public site's header,
+ * with cream/white text and a terracotta accent — the actual "look
+ * like the site" request. Left alone, Unfold's sidebar is a neutral
+ * white/near-black surface with green used only as a small text/icon
+ * accent, which is why it didn't read as "green" the way the site's
+ * header does.
+ *
+ * Important: this is why the main content area (#main, forms, tables)
+ * is deliberately NOT recolored here and stays light with dark text —
+ * black text is only readable on a light surface, never on top of this
+ * same dark green, so the two-zone split (green sidebar / cream
+ * content) is what the public site itself does too (dark emerald
+ * header+footer, cream body in between).
+ * ------------------------------------------------------------------ */
+
+#nav-sidebar-inner {
+    background-color: #0b4f3c; /* --acd-emerald, same as the public site's header/footer */
+    color: #f8f3e9; /* --acd-cream, inherited fallback */
+}
+
+/* Unfold applies these Tailwind classes directly on elements (labels,
+   the group section titles, the user's name/email block), which beats
+   plain inheritance from the rule above — restated explicitly here. */
+#nav-sidebar-inner .text-font-default-light,
+#nav-sidebar-inner .text-font-important-light,
+#nav-sidebar-inner .text-important,
+#nav-sidebar-inner .text-subtle {
+    color: #f8f3e9 !important;
+}
+
+/* "You are here": Unfold's own active-item style is dark green text on
+   a light-gray chip (bg-base-100 + text-primary-600) — invisible once
+   the sidebar itself is that same green. Swapped for a translucent
+   white chip, white text, and a terracotta accent bar. border-inline
+   -start (not border-left) so it lands on the correct edge in both
+   Persian (RTL, right edge) and English (LTR, left edge). */
+#nav-sidebar-inner a.active {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border-inline-start: 3px solid #b3452c;
+    color: #ffffff !important;
+}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}ACDNews · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-4 acd-reveal">ACDNews</h1>
+
+  <!-- The four news sections — a post is auto-filed under whichever of
+       these matched one of its tags at save-time (apps/blog/models.py),
+       or wherever the admin picked directly. Query param, no page reload
+       needed to feel modern — plain links keep it simple and shareable. -->
+  <ul class="nav nav-pills justify-content-center mb-5 flex-wrap gap-2 acd-reveal">
+    <li class="nav-item">
+      <a class="nav-link acd-nav-link-urgent {% if show_urgent_only %}active{% endif %}" href="?urgent=1">
+        <i class="bi bi-lightning-fill me-1"></i> {% t "خبر فوری" %}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if not active_category and not show_urgent_only %}active{% endif %}" href="{% url 'blog:acdnews' %}">
+        <i class="bi bi-grid me-1"></i> {% t "همه" %}
+      </a>
+    </li>
+    {% for pill in category_pills %}
+    <li class="nav-item">
+      <a class="nav-link {% if active_category == pill.key %}active{% endif %}" href="?category={{ pill.key }}">
+        <i class="bi bi-{{ pill.icon }} me-1"></i> {% t pill.label %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <!-- Posts come from the Post model (apps/blog/models.py) — the admin
+       writes one post, picks ACDNews, and it shows up here automatically. -->
+  {% if posts %}
+  <div class="row g-4">
+    {% for post in posts %}
+    <div class="col-md-6 col-lg-4 acd-reveal">
+      <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-reset d-block h-100{% if post.is_urgent %} acd-urgent{% endif %}">
+        {% if post.is_urgent %}
+        <span class="acd-urgent-ribbon"><i class="bi bi-lightning-fill"></i> {% t "خبر فوری" %}</span>
+        {% endif %}
+        <div class="card acd-tile acd-news-card h-100">
+          <div class="acd-news-media">
+            <div class="ratio ratio-16x9 overflow-hidden acd-media-placeholder">
+              {% if post.display_image %}
+              <img src="{{ post.display_image }}" alt="{{ post.title }}">
+              {% else %}
+              <div class="d-flex align-items-center justify-content-center">
+                <span class="acd-icon-chip"><i class="bi bi-newspaper"></i></span>
+              </div>
+              {% endif %}
+            </div>
+            {% if post.category %}
+            <span class="acd-cat-pill acd-cat-badge acd-cat-{{ post.category }}">{% t post.get_category_display %}</span>
+            {% endif %}
+          </div>
+          <div class="card-body p-4 d-flex flex-column">
+            {% if post.source_name %}
+            <span class="acd-news-source mb-2"><i class="bi bi-link-45deg"></i> {{ post.source_name }}</span>
+            {% endif %}
+            <h2 class="h6 mb-2">{{ post.title }}</h2>
+            <p class="text-muted small acd-clamp-2 mb-2">{{ post.display_summary }}</p>
+            {% if post.tag_list %}
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              {% for tag in post.tag_list %}
+              <span class="acd-tag-pill">#{{ tag }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <span class="acd-news-date mt-auto pt-1"><i class="bi bi-clock-history"></i> {{ post.published_at|date:"Y/m/d" }}</span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-newspaper"></i></span>
+    <p class="text-muted mb-0">{% t "هنوز خبری منتشر نشده است. اخبار هر یک از این چهار دسته، همراه با منبع و برچسب‌ها، اینجا نمایش داده می‌شوند." %}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

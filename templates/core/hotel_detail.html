@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{{ hotel.name }} · {{ hotel.country.name }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<section class="acd-country-hero acd-attraction-hero acd-reveal"
+         {% if hotel.display_image %}style="background-image: url('{{ hotel.display_image }}');"{% elif hotel.country.display_background %}style="background-image: url('{{ hotel.country.display_background }}');"{% endif %}>
+  <div class="acd-country-hero-overlay">
+    <div class="container py-5">
+      <a href="{{ hotel.country.get_absolute_url }}" class="acd-attraction-back">
+        <i class="bi bi-arrow-{% if LANGUAGE_BIDI %}right{% else %}left{% endif %}"></i>
+        {{ hotel.country.name }}
+      </a>
+      <h1 class="display-6 fw-bold mb-0 text-white mt-2">{{ hotel.name }}</h1>
+      <p class="text-white-50 mb-0 mt-1">
+        <span class="acd-hotel-stars-inline">{{ hotel.get_star_rating_display }}</span>
+        {% if hotel.city %}<span class="mx-1">·</span><i class="bi bi-geo-alt"></i> {{ hotel.city }}{% endif %}
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5" style="max-width: 860px;">
+
+  {% if hotel.address or hotel.phone_number or price_toman %}
+  <div class="acd-quickfacts acd-reveal mb-4">
+    {% if hotel.address %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-geo-alt-fill"></i></span>
+      <div><span class="acd-quickfact-label">{% t "آدرس" %}</span><span class="acd-quickfact-value">{{ hotel.address }}</span></div>
+    </div>
+    {% endif %}
+    {% if hotel.phone_number %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-telephone-fill"></i></span>
+      <div><span class="acd-quickfact-label">{% t "تماس با هتل" %}</span><span class="acd-quickfact-value"><a href="tel:{{ hotel.phone_number }}" class="acd-hotel-phone-link">{{ hotel.phone_number }}</a></span></div>
+    </div>
+    {% endif %}
+    {% if price_toman %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-cash-coin"></i></span>
+      <div><span class="acd-quickfact-label">{% t "قیمت تقریبی هر شب" %}</span><span class="acd-quickfact-value">{{ price_toman|floatformat:0 }} {% t "تومان" %} <span class="text-muted small">(${{ hotel.price_usd|floatformat:0 }})</span></span></div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if hotel.address or hotel.city %}
+  <div class="acd-hotel-map acd-reveal mb-4">
+    <iframe
+      src="{{ maps_embed_url }}"
+      width="100%" height="320" style="border:0;" loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="{% t 'نقشه‌ی هتل' %}"></iframe>
+  </div>
+  {% endif %}
+
+  {% if hotel.summary %}
+  <p class="lead acd-reveal">{{ hotel.summary }}</p>
+  {% endif %}
+
+  {% if hotel.description %}
+  <div class="acd-article-body acd-reveal">{{ hotel.description|linebreaks }}</div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-info-circle"></i></span>
+    <p class="text-muted mb-0">{% t "توضیحاتی برای این هتل ثبت نشده است." %}</p>
+  </div>
+  {% endif %}
+
+  {% if hotel.booking_url %}
+  <a href="{{ hotel.booking_url }}" target="_blank" rel="noopener" class="btn btn-acd-primary mt-4">
+    <i class="bi bi-box-arrow-up-{% if LANGUAGE_BIDI %}left{% else %}right{% endif %}"></i>
+    {% t "رزرو / اطلاعات بیشتر" %}
+  </a>
+  {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{{ ticket.subject }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 720px;">
+  <a href="{% url 'support:ticket_list' %}" class="text-decoration-none small mb-3 d-inline-block acd-reveal">
+    <i class="bi bi-arrow-{% if LANGUAGE_BIDI %}right{% else %}left{% endif %} me-1"></i> {% t "بازگشت به تیکت‌ها" %}
+  </a>
+
+  <div class="d-flex justify-content-between align-items-start gap-2 mb-4 acd-reveal">
+    <h1 class="h4 mb-0">{{ ticket.subject }}</h1>
+    <span class="acd-status-pill acd-status-{{ ticket.status }}">{% t ticket.get_status_display %}</span>
+  </div>
+
+  <div class="acd-ticket-thread mb-4 acd-reveal">
+    {% for message in ticket_messages %}
+    <div class="acd-ticket-row {% if message.is_staff_reply %}acd-bubble-start{% else %}acd-bubble-end{% endif %}">
+      <div class="acd-ticket-bubble {% if message.is_staff_reply %}acd-ticket-bubble-staff{% else %}acd-ticket-bubble-user{% endif %}">
+        <span class="acd-ticket-bubble-sender">
+          {% if message.is_staff_reply %}<i class="bi bi-headset me-1"></i>{% t "پشتیبانی" %}{% else %}{% t "شما" %}{% endif %}
+        </span>
+        <div class="acd-ticket-bubble-body">{{ message.body|linebreaks }}</div>
+        <span class="acd-ticket-bubble-meta">{{ message.created_at|timesince }} {% t "پیش" %}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- No reply box here on purpose — a ticket is submitted once; only
+       staff can add to the thread, from /admin/. This just watches the
+       conversation and shows the status; a bell notification (see
+       templates/partials/header.html) fires the moment support replies. -->
+  <div class="acd-empty-state acd-reveal py-4">
+    <span class="acd-empty-icon"><i class="bi bi-bell"></i></span>
+    <p class="text-muted small mb-0">
+      {% t "به‌محض پاسخ پشتیبانی، از طریق زنگوله‌ی بالای سایت به شما اطلاع داده می‌شود." %}
+    </p>
+  </div>
+</div>
+{% endblock %}

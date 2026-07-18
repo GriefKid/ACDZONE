@@ -1,0 +1,30 @@
+{% load i18n static acd_i18n %}
+<footer class="acd-footer mt-5 pt-5 pb-4">
+  <div class="container">
+    <div class="row g-4 align-items-center pb-4 mb-4 acd-footer-top">
+      <div class="col-md-6">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <img src="{% static 'img/logo.svg' %}" alt="{{ SITE_NAME }}" height="32" onerror="this.style.display='none'">
+        </div>
+        <p class="small mb-0 acd-footer-tagline">
+          {% t "کارت‌های شارژ بین‌المللی و تجربه‌ی بالن‌سواری — با اطمینان و امنیت کامل." %}
+        </p>
+      </div>
+      <div class="col-md-6 d-flex justify-content-md-end gap-2">
+        <a href="{{ CONTACT_TELEGRAM_URL }}" class="acd-footer-social" title="{% t 'تلگرام' %}">
+          <i class="bi bi-telegram fs-5"></i>
+        </a>
+        <a href="{{ CONTACT_WHATSAPP_URL }}" class="acd-footer-social" title="{% t 'واتساپ' %}">
+          <i class="bi bi-whatsapp fs-5"></i>
+        </a>
+      </div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <span class="small acd-footer-tagline">&copy; {% now "Y" %} {{ SITE_NAME }}</span>
+      <ul class="list-inline mb-0 d-flex flex-wrap gap-3 small">
+        <li><a href="#">{% t "تماس با ما" %}</a></li>
+        <li><a href="#">{% t "قوانین و مقررات" %}</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

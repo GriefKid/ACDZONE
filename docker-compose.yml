@@ -1,0 +1,21 @@
+# `docker compose up` (or `docker compose up --build` the first time) is
+# all that's needed: docker-entrypoint.sh inside the image handles
+# "migrate, then poll_telegram in the background, then runserver" itself,
+# in that order, every time the container starts.
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Code + the sqlite DB + uploaded media live on the host, so edits
+      # and data survive a rebuild — same dev workflow as running
+      # manage.py directly, just inside the container instead.
+      - .:/app
+    # Uses the project's own .env if present (see .env.example) — copy it
+    # to .env first, or requests will 500 without a SECRET_KEY. Missing
+    # Telegram values are fine (apps/support/telegram_bot.py no-ops
+    # without a token instead of failing).
+    env_file:
+      - path: .env
+        required: false

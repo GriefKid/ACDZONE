@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "ورود" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 480px;">
+  <div class="acd-auth-card acd-reveal">
+    <div class="acd-auth-banner">
+      <i class="bi bi-shield-lock fs-1 mb-2 d-block"></i>
+      <h1 class="h4 mb-0 text-white">{% t "ورود به حساب کاربری" %}</h1>
+    </div>
+    <div class="bg-white p-4">
+      {% if form.errors %}
+      <div class="alert alert-danger">{% t "نام کاربری یا رمز عبور اشتباه است." %}</div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn btn-acd-primary w-100 mt-3">{% t "ورود" %}</button>
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center mt-3">
+    {% t "حساب کاربری ندارید؟" %}
+    <a href="{% url 'accounts:signup' %}">{% t "ثبت‌نام کنید" %}</a>
+  </p>
+</div>
+{% endblock %}

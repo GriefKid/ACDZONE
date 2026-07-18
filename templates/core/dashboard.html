@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "داشبورد" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4 h3 acd-reveal">{% t "داشبورد" %}</h1>
+
+  <!-- Bento-style grid: ACDPay gets a wide "hero" tile since it's the
+       primary revenue path; the rest sit in a more even row below. -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8 acd-reveal">
+      <a href="{% url 'shop:acdpay' %}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 p-4 p-lg-5">
+          <div class="d-flex align-items-center gap-4">
+            <span class="acd-icon-chip acd-icon-chip--gold flex-shrink-0" style="width: 4.5rem; height: 4.5rem; font-size: 2rem;">
+              <i class="bi bi-credit-card-2-front"></i>
+            </span>
+            <div>
+              <h2 class="h4 mb-1">ACDPay</h2>
+              <p class="text-muted mb-0">{% t "خرید کارت‌های یونیون‌کارت و ویزاکارت" %}</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-lg-4 acd-reveal">
+      <a href="{% url 'shop:acdballoons' %}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 text-center p-4 d-flex flex-column justify-content-center">
+          <span class="acd-icon-chip mx-auto mb-2"><i class="bi bi-airplane"></i></span>
+          <h2 class="h5">ACDBallons</h2>
+          <p class="text-muted small mb-0">{% t "خرید بلیط بالن‌سواری" %}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-sm-6 col-lg-3 acd-reveal">
+      <a href="{% url 'blog:acdnews' %}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 text-center p-4">
+          <span class="acd-icon-chip mx-auto mb-2"><i class="bi bi-newspaper"></i></span>
+          <h2 class="h5">ACDNews</h2>
+          <p class="text-muted small mb-0">{% t "اخبار ورزشی، اقتصادی، سیاسی و اجتماعی" %}</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-3 acd-reveal">
+      <a href="{% url 'blog:acdnotes' %}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 text-center p-4">
+          <span class="acd-icon-chip mx-auto mb-2"><i class="bi bi-journal-text"></i></span>
+          <h2 class="h5">ACDNotes</h2>
+          <p class="text-muted small mb-0">{% t "تازه‌ها و فیچرهای جدید سایت" %}</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-3 acd-reveal">
+      <a href="{% url 'shop:my_products' %}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 text-center p-4">
+          <span class="acd-icon-chip acd-icon-chip--gold mx-auto mb-2"><i class="bi bi-bag-check"></i></span>
+          <h2 class="h5">{% t "محصولات من" %}</h2>
+          <p class="text-muted small mb-0">{% t "پیگیری خریدها و مرحله‌ی سفارش" %}</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-3 acd-reveal">
+      <a href="{% url 'support:ticket_list' %}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 text-center p-4">
+          <span class="acd-icon-chip mx-auto mb-2"><i class="bi bi-life-preserver"></i></span>
+          <h2 class="h5">ACDSupport</h2>
+          <p class="text-muted small mb-0">{% t "ثبت تیکت و پیگیری پشتیبانی" %}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

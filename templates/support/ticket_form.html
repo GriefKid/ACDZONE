@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "تیکت جدید" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 560px;">
+  <div class="acd-auth-card acd-reveal">
+    <div class="acd-auth-banner">
+      <i class="bi bi-life-preserver fs-1 mb-2 d-block"></i>
+      <h1 class="h4 mb-0 text-white">{% t "ثبت تیکت جدید" %}</h1>
+    </div>
+    <div class="bg-white p-4">
+      <p class="text-muted small">
+        {% t "سوال یا مشکلتان را بنویسید؛ پشتیبانی از همین صفحه پاسخ می‌دهد." %}
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-acd-primary w-100 mt-3">{% t "ارسال تیکت" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

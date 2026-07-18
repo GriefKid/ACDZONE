@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{{ representative.full_name }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<section class="acd-rep-hero acd-reveal"
+         {% if representative.country.display_background %}style="background-image: url('{{ representative.country.display_background }}');"{% endif %}>
+  <div class="acd-rep-hero-overlay">
+    <div class="container py-5">
+      <div class="acd-rep-hero-copy">
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+          {% if representative.country.display_flag %}
+          <img src="{{ representative.country.display_flag }}" alt="{{ representative.country.name }}" class="acd-country-flag-sm">
+          {% endif %}
+          <span class="acd-rep-country">{{ representative.country.name }}</span>
+        </div>
+        <h1 class="display-6 fw-bold mb-2 text-white">{{ representative.full_name }}</h1>
+        {% if representative.position %}
+        <p class="text-white-50 mb-0">{{ representative.position }}</p>
+        {% else %}
+        <p class="text-white-50 mb-0">{% t "نماینده رسمی" %} {{ representative.country.name }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="acd-rep-main-grid">
+    <div class="acd-rep-photo-card acd-reveal">
+      {% if representative.display_photo %}
+      <img src="{{ representative.display_photo }}" alt="{{ representative.full_name }}" class="acd-rep-main-photo">
+      {% else %}
+      <span class="acd-rep-main-photo acd-rep-photo-fallback">{{ representative.first_name|first }}{{ representative.last_name|first }}</span>
+      {% endif %}
+    </div>
+
+    <div class="acd-rep-contact-card acd-reveal">
+      <h2 class="h5 mb-4">{% t "اطلاعات تماس" %}</h2>
+
+      <div class="acd-rep-contact-item">
+        <span class="acd-rep-contact-icon"><i class="bi bi-person-badge"></i></span>
+        <div>
+          <span class="text-muted small d-block">{% t "نام و نام خانوادگی" %}</span>
+          <strong>{{ representative.full_name }}</strong>
+        </div>
+      </div>
+
+      <div class="acd-rep-contact-item">
+        <span class="acd-rep-contact-icon"><i class="bi bi-geo-alt"></i></span>
+        <div>
+          <span class="text-muted small d-block">{% t "کشور نمایندگی" %}</span>
+          <strong>{{ representative.country.name }}</strong>
+        </div>
+      </div>
+
+      {% if representative.phone %}
+      <a class="acd-rep-contact-item acd-rep-contact-link" href="tel:{{ representative.phone }}">
+        <span class="acd-rep-contact-icon"><i class="bi bi-telephone"></i></span>
+        <div>
+          <span class="text-muted small d-block">{% t "شماره تماس" %}</span>
+          <strong dir="ltr">{{ representative.phone }}</strong>
+        </div>
+      </a>
+      {% endif %}
+
+      {% if representative.email %}
+      <a class="acd-rep-contact-item acd-rep-contact-link" href="mailto:{{ representative.email }}">
+        <span class="acd-rep-contact-icon"><i class="bi bi-envelope"></i></span>
+        <div>
+          <span class="text-muted small d-block">{% t "ایمیل" %}</span>
+          <strong>{{ representative.email }}</strong>
+        </div>
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="acd-rep-story acd-reveal">
+      <h2 class="h4 mb-3">{% t "پروفایل نماینده" %}</h2>
+      {% if representative.bio %}
+      <div class="acd-article-body">{{ representative.bio|linebreaks }}</div>
+      {% else %}
+      <p class="text-muted mb-0">
+        {% t "اطلاعات تکمیلی این نماینده هنوز ثبت نشده است." %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

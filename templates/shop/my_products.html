@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "محصولات من" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4 h3 acd-reveal">{% t "محصولات من" %}</h1>
+
+  {% if orders %}
+  <div class="row g-4">
+    {% for order in orders %}
+    <div class="col-md-6 acd-reveal">
+      <div class="card acd-tile h-100 p-3">
+        <div class="d-flex gap-3 h-100">
+          <div class="acd-media-placeholder rounded-3 overflow-hidden flex-shrink-0" style="width: 72px; height: 72px;">
+            {% if order.product.display_image %}
+            <img src="{{ order.product.display_image }}" alt="" style="width: 72px; height: 72px; object-fit: cover;">
+            {% endif %}
+          </div>
+          <div class="flex-grow-1 d-flex flex-column">
+            <h2 class="h6 mb-2">{{ order.product.title }}</h2>
+            <span class="badge-trust mb-2 d-inline-flex"><i class="bi bi-dot"></i> {% t order.stage_label %}</span>
+            <div class="d-flex gap-2 mt-auto pt-2">
+              <a href="{% url 'shop:order_detail' order.pk %}" class="btn btn-sm btn-outline-success">{% t "مشاهده جزئیات" %}</a>
+              <form method="post" action="{% url 'shop:order_delete' order.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">{% t "حذف" %}</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-inbox"></i></span>
+    <p class="text-muted">
+      {% t "هنوز خریدی ثبت نشده است. وقتی کارتی از ACDPay بخرید، همین‌جا لیست می‌شود و می‌توانید مرحله‌ی سفارش را پیگیری کنید:" %}
+    </p>
+
+    <div class="acd-stepper my-4">
+      {% for stage in acdpay_stage_preview %}
+      <div class="acd-step">
+        <span class="acd-step-index">{{ forloop.counter }}</span>
+        <span class="acd-step-label">{% t stage %}</span>
+      </div>
+      {% if not forloop.last %}
+      <i class="bi bi-chevron-{% if LANGUAGE_BIDI %}left{% else %}right{% endif %} text-muted align-self-center mx-1"></i>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <p class="text-muted small fst-italic mb-0">
+      {% t "بلیط‌های ACDBallons مراحل ساده‌تری دارند (بدون ثبت بانکی و چاپ)." %}
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

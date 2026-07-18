@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "پروفایل" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4 h3 acd-reveal">{% t "پروفایل من" %}</h1>
+
+  <div class="acd-auth-card acd-reveal" style="max-width: 560px;">
+    <div class="acd-auth-banner">
+      <span class="acd-avatar-chip mx-auto mb-2" style="width: 3rem; height: 3rem; font-size: 1.3rem;">
+        {{ user.get_username|first|upper }}
+      </span>
+      <h2 class="h5 mb-0 text-white">{{ user.get_username }}</h2>
+    </div>
+    <div class="bg-white p-4">
+      <dl class="row mb-0">
+        <dt class="col-sm-4 text-muted"><i class="bi bi-person me-1"></i> {% t "نام کاربری" %}</dt>
+        <dd class="col-sm-8">{{ user.get_username }}</dd>
+
+        <dt class="col-sm-4 text-muted"><i class="bi bi-envelope me-1"></i> {% t "ایمیل" %}</dt>
+        <dd class="col-sm-8">{{ user.email|default:"—" }}</dd>
+
+        <dt class="col-sm-4 text-muted"><i class="bi bi-phone me-1"></i> {% t "شماره موبایل" %}</dt>
+        <dd class="col-sm-8">{{ user.phone_number|default:"—" }}</dd>
+      </dl>
+    </div>
+  </div>
+
+  <p class="text-muted mt-3">
+    {% t "ویرایش پروفایل، آواتار و آدرس‌ها در مرحله‌ی بعدی پیاده‌سازی اضافه می‌شود." %}
+  </p>
+
+  <a href="{% url 'shop:my_products' %}" class="btn btn-outline-success mt-2">
+    {% t "محصولات من" %}
+  </a>
+</div>
+{% endblock %}

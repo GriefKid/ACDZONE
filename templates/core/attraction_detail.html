@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{{ attraction.name }} · {{ attraction.country.name }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<section class="acd-country-hero acd-attraction-hero acd-reveal"
+         {% if attraction.display_image %}style="background-image: url('{{ attraction.display_image }}');"{% elif attraction.country.display_background %}style="background-image: url('{{ attraction.country.display_background }}');"{% endif %}>
+  <div class="acd-country-hero-overlay">
+    <div class="container py-5">
+      <a href="{{ attraction.country.get_absolute_url }}" class="acd-attraction-back">
+        <i class="bi bi-arrow-{% if LANGUAGE_BIDI %}right{% else %}left{% endif %}"></i>
+        {{ attraction.country.name }}
+      </a>
+      <h1 class="display-6 fw-bold mb-0 text-white mt-2">{{ attraction.name }}</h1>
+      {% if attraction.summary %}<p class="text-white-50 mb-0 mt-1">{{ attraction.summary }}</p>{% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="container py-5" style="max-width: 860px;">
+  {% if attraction.description %}
+  <div class="acd-article-body acd-reveal">{{ attraction.description|linebreaks }}</div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-info-circle"></i></span>
+    <p class="text-muted mb-0">{% t "توضیحاتی برای این جاذبه ثبت نشده است." %}</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

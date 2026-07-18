@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n humanize static %}
+
+{% block title %}ACDPay · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-3 acd-reveal">ACDPay</h1>
+  <p class="text-center text-muted mb-4 acd-reveal">{% t "خرید امن کارت‌های شارژ بین‌المللی" %}</p>
+
+  <!-- Trust badges -->
+  <div class="d-flex flex-wrap justify-content-center gap-2 mb-5 acd-reveal">
+    <span class="badge-trust"><i class="bi bi-shield-check"></i> {% t "ضمانت اصالت کالا" %}</span>
+    <span class="badge-trust"><i class="bi bi-lock"></i> {% t "پرداخت امن" %}</span>
+    <span class="badge-trust"><i class="bi bi-truck"></i> {% t "پیگیری سفارش" %}</span>
+    <span class="badge-trust"><i class="bi bi-headset"></i> {% t "پشتیبانی ۲۴ ساعته" %}</span>
+    <span class="badge-trust"><i class="bi bi-chat-dots"></i> {% t "اطلاع‌رسانی پیامکی" %}</span>
+  </div>
+
+  <!-- Products come from the Category/Product models (apps/shop/models.py)
+       now — add, edit, price, or reorder cards from the admin panel and
+       this list updates with no code change. -->
+  {% if products %}
+  <div class="row g-4 justify-content-center">
+    {% for product in products %}
+    <div class="col-md-5 acd-reveal">
+      <div class="card acd-tile acd-product-card h-100">
+        <div class="acd-product-media">
+          <div class="ratio ratio-4x3 overflow-hidden acd-media-placeholder">
+            {% if product.display_image %}
+            <img src="{{ product.display_image }}" alt="{{ product.title }}">
+            {% else %}
+            <div class="d-flex align-items-center justify-content-center">
+              <span class="acd-icon-chip acd-icon-chip--gold"><i class="bi bi-credit-card-2-back"></i></span>
+            </div>
+            {% endif %}
+          </div>
+          <span class="acd-price-tag">{{ product.price|intcomma }} {% t "تومان" %}</span>
+        </div>
+        <div class="card-body text-center p-4">
+          <h2 class="h5 mb-2">{{ product.title }}</h2>
+          <p class="text-muted small acd-product-desc mb-3">{{ product.description }}</p>
+          {% if user.is_authenticated %}
+          <a href="{% url 'shop:buy' product.id %}" class="btn btn-acd-primary w-100"><i class="bi bi-bag-check me-1"></i>{% t "خرید" %}</a>
+          {% else %}
+          <!-- Signed-out visitor: don't redirect immediately — open the
+               shared auth-required modal (templates/partials/
+               auth_required_modal.html) instead. data-login-url/
+               data-signup-url already carry ?next= pointed at THIS
+               product's buy page, so static/js/main.js can wire them onto
+               the modal's buttons the moment it opens. -->
+          <button type="button" class="btn btn-acd-primary w-100" data-bs-toggle="modal" data-bs-target="#authRequiredModal"
+                  data-login-url="{% url 'accounts:login' %}?next={% url 'shop:buy' product.id %}"
+                  data-signup-url="{% url 'accounts:signup' %}?next={% url 'shop:buy' product.id %}">
+            <i class="bi bi-bag-check me-1"></i>{% t "خرید" %}
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-credit-card"></i></span>
+    <p class="text-muted mb-0">{% t "به‌زودی محصولی برای نمایش اضافه می‌شود." %}</p>
+  </div>
+  {% endif %}
+
+  <!-- Intro video + text -->
+  <div class="row align-items-center g-4 mt-5 pt-4 border-top acd-reveal">
+    <div class="col-lg-6">
+      <div class="ratio ratio-16x9 rounded-4 overflow-hidden acd-media-placeholder">
+        {% if intro_video_exists %}
+        <video controls class="w-100 h-100" style="object-fit: cover;">
+          <source src="{% static 'video/acdpay-intro.mp4' %}" type="video/mp4">
+          {% if intro_subtitle_exists %}
+          <track src="{% static 'video/acdpay-intro-fa.vtt' %}" kind="subtitles" srclang="fa" label="{% t 'فارسی' %}" default>
+          {% endif %}
+          {% t "مرورگر شما از پخش این ویدیو پشتیبانی نمی‌کند." %}
+        </video>
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center">
+          <span class="text-white-50 text-center px-3">{% t "ویدیوی معرفی کارت‌ها" %}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <h2 class="h4 mb-3">{% t "این کارت‌ها چطور کار می‌کنند؟" %}</h2>
+      {% if products_with_info %}
+      <div class="accordion acd-product-accordion" id="productInfoAccordion">
+        {% for product in products_with_info %}
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#productInfo{{ product.id }}">
+              {{ product.title }}
+            </button>
+          </h3>
+          <div id="productInfo{{ product.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+               data-bs-parent="#productInfoAccordion">
+            <div class="accordion-body">{{ product.long_description|linebreaks }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-muted">
+        {% t "متن معرفی و راهنمای استفاده از کارت‌ها اینجا نمایش داده می‌شود؛ این محتوا هم از پنل ادمین قابل ویرایش خواهد بود." %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

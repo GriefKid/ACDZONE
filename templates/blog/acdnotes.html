@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}ACDNotes · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 760px;">
+  <h1 class="text-center mb-2 acd-reveal">ACDNotes</h1>
+  <p class="text-center text-muted mb-5 acd-reveal">{% t "تازه‌ها و فیچرهای جدید سایت" %}</p>
+
+  <!-- Posts come from the Post model (apps/blog/models.py), channel=notes.
+       A vertical timeline instead of a card grid on purpose — this reads
+       as a changelog/updates feed, visually distinct from ACDNews'
+       article grid even though both share the same underlying model. -->
+  {% if posts %}
+  <div class="acd-timeline acd-reveal">
+    {% for post in posts %}
+    <div class="acd-timeline-item">
+      <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-reset d-block{% if post.is_urgent %} acd-urgent{% endif %}">
+        {% if post.is_urgent %}
+        <span class="acd-urgent-ribbon"><i class="bi bi-lightning-fill"></i> {% t "خبر فوری" %}</span>
+        {% endif %}
+        <div class="card acd-tile acd-timeline-card p-4">
+          {% if post.display_image %}
+          <div class="ratio ratio-21x9 rounded-3 overflow-hidden acd-media-placeholder mb-3">
+            <img src="{{ post.display_image }}" alt="{{ post.title }}">
+          </div>
+          {% endif %}
+          <span class="acd-news-date mb-2 d-inline-flex"><i class="bi bi-calendar3"></i> {{ post.published_at|date:"Y/m/d" }}</span>
+          <h2 class="h5 mb-2">{{ post.title }}</h2>
+          <p class="text-muted small acd-clamp-2 mb-0">{{ post.display_summary }}</p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-journal-text"></i></span>
+    <p class="text-muted mb-0">{% t "هنوز یادداشتی منتشر نشده است. تازه‌ها و فیچرهای جدید سایت اینجا اعلام می‌شوند." %}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

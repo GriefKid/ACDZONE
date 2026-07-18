@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{{ country.name }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<section class="acd-country-hero acd-reveal"
+         {% if country.display_background %}style="background-image: url('{{ country.display_background }}');"{% endif %}>
+  <div class="acd-country-hero-overlay">
+    <div class="container py-5">
+      <div class="d-flex align-items-center gap-3">
+        {% if country.display_flag %}
+        <img src="{{ country.display_flag }}" alt="{{ country.name }}" class="acd-country-flag-lg">
+        {% endif %}
+        <h1 class="display-6 fw-bold mb-0 text-white">{{ country.name }}</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5" style="max-width: 860px;">
+
+  {% if country.capital or country.official_language or country.currency or country.calling_code or country.best_time_to_visit %}
+  <div class="acd-quickfacts acd-reveal mb-4">
+    {% if country.capital %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-building"></i></span>
+      <div><span class="acd-quickfact-label">{% t "پایتخت" %}</span><span class="acd-quickfact-value">{{ country.capital }}</span></div>
+    </div>
+    {% endif %}
+    {% if country.official_language %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-translate"></i></span>
+      <div><span class="acd-quickfact-label">{% t "زبان رسمی" %}</span><span class="acd-quickfact-value">{{ country.official_language }}</span></div>
+    </div>
+    {% endif %}
+    {% if country.currency %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-cash-coin"></i></span>
+      <div><span class="acd-quickfact-label">{% t "واحد پول" %}</span><span class="acd-quickfact-value">{{ country.currency }}</span></div>
+    </div>
+    {% endif %}
+    {% if country.calling_code %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-telephone"></i></span>
+      <div><span class="acd-quickfact-label">{% t "کد تلفن" %}</span><span class="acd-quickfact-value">{{ country.calling_code }}</span></div>
+    </div>
+    {% endif %}
+    {% if country.best_time_to_visit %}
+    <div class="acd-quickfact">
+      <span class="acd-quickfact-icon"><i class="bi bi-calendar-heart"></i></span>
+      <div><span class="acd-quickfact-label">{% t "بهترین فصل سفر" %}</span><span class="acd-quickfact-value">{{ country.best_time_to_visit }}</span></div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if has_currency_chart %}
+  <div class="acd-currency-chart acd-reveal mb-4">
+    <h2 class="h6 mb-1"><i class="bi bi-graph-up"></i> {% t "ارزش پول این کشور" %}</h2>
+    <p class="text-muted small mb-3">
+      {% t "۱ دلار آمریکا برابر است با:" %}
+      <strong>{{ local_units_per_usd|floatformat:2 }} {{ currency_code }}</strong>
+      {% t "و" %}
+      <strong>{{ toman_rate|floatformat:0 }} {% t "تومان" %}</strong>
+      — {% t "این نرخ هر روز به‌طور خودکار به‌روزرسانی می‌شود." %}
+    </p>
+    <div class="acd-css-chart">
+      <div class="acd-css-bar-row">
+        <span class="acd-css-bar-label">{{ currency_code }}</span>
+        <div class="acd-css-bar-track">
+          <div class="acd-css-bar-fill acd-css-bar-fill--local" style="width: {{ local_bar_pct }}%;">
+            <span class="acd-css-bar-value">{{ local_units_per_usd|floatformat:2 }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="acd-css-bar-row">
+        <span class="acd-css-bar-label">{% t "تومان" %}</span>
+        <div class="acd-css-bar-track">
+          <div class="acd-css-bar-fill acd-css-bar-fill--toman" style="width: {{ toman_bar_pct }}%;">
+            <span class="acd-css-bar-value">{{ toman_rate|floatformat:0 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if country.weather_spring or country.weather_summer or country.weather_autumn or country.weather_winter %}
+  <div class="acd-weather-seasons acd-reveal mb-4">
+    <h2 class="h5 mb-3"><i class="bi bi-cloud-sun"></i> {% t "آب‌وهوا در فصل‌های مختلف" %}</h2>
+    <div class="acd-weather-grid">
+      {% if country.weather_spring %}
+      <div class="acd-weather-card acd-weather-card--spring">
+        <span class="acd-weather-icon"><i class="bi bi-flower1"></i></span>
+        <div>
+          <span class="acd-weather-season">{% t "بهار" %}</span>
+          <p class="acd-weather-text">{{ country.weather_spring }}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if country.weather_summer %}
+      <div class="acd-weather-card acd-weather-card--summer">
+        <span class="acd-weather-icon"><i class="bi bi-sun"></i></span>
+        <div>
+          <span class="acd-weather-season">{% t "تابستان" %}</span>
+          <p class="acd-weather-text">{{ country.weather_summer }}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if country.weather_autumn %}
+      <div class="acd-weather-card acd-weather-card--autumn">
+        <span class="acd-weather-icon"><i class="bi bi-leaf"></i></span>
+        <div>
+          <span class="acd-weather-season">{% t "پاییز" %}</span>
+          <p class="acd-weather-text">{{ country.weather_autumn }}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if country.weather_winter %}
+      <div class="acd-weather-card acd-weather-card--winter">
+        <span class="acd-weather-icon"><i class="bi bi-snow2"></i></span>
+        <div>
+          <span class="acd-weather-season">{% t "زمستان" %}</span>
+          <p class="acd-weather-text">{{ country.weather_winter }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if country.display_anthem %}
+  <div class="acd-country-anthem acd-reveal mb-4">
+    <h2 class="h5 mb-3"><i class="bi bi-music-note-beamed"></i> {% t "سرود ملی" %}</h2>
+    {% if country.anthem_is_youtube %}
+    <div class="ratio ratio-16x9 rounded-4 overflow-hidden acd-media-placeholder">
+      <iframe src="{{ country.anthem_youtube_embed_url }}" title="{% t 'سرود ملی' %}"
+              allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+    {% else %}
+    <audio controls class="w-100" preload="none">
+      <source src="{{ country.display_anthem }}">
+      {% t "مرورگر شما از پخش این فایل صوتی پشتیبانی نمی‌کند." %}
+    </audio>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if country.description %}
+  <div class="acd-article-body acd-reveal">{{ country.description|linebreaks }}</div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-info-circle"></i></span>
+    <p class="text-muted mb-0">{% t "توضیحاتی برای این کشور ثبت نشده است." %}</p>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- Everything below is deliberately kept collapsed-by-default inside an
+     accordion (bootstrap's own accordion component) — the brief was
+     "پر از هر چیز گردشگری، ولی شلوغ نشه": each section only expands (and
+     its content only ever renders, images and all — Django's for/if
+     template tags already ran at render time regardless of hidden HTML,
+     but everything here IS already in the DOM, Bootstrap's accordion just
+     toggles a CSS class) when the visitor actually wants it. Wider
+     container than the description above (1000px vs 860px) since a card
+     grid needs the extra room. -->
+<div class="container pb-5" style="max-width: 1000px;">
+  <div class="accordion acd-country-accordion" id="countryExtrasAccordion">
+
+    <div class="accordion-item acd-reveal">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#countryAttractions">
+          <i class="bi bi-camera me-2"></i> {% t "جاذبه‌های گردشگری" %}
+          {% if attractions %}<span class="badge acd-count-badge ms-2">{{ attractions|length }}</span>{% endif %}
+        </button>
+      </h2>
+      <div id="countryAttractions" class="accordion-collapse collapse" data-bs-parent="#countryExtrasAccordion">
+        <div class="accordion-body">
+          {% if attractions %}
+          <div class="row g-4">
+            {% for attraction in attractions %}
+            <div class="col-sm-6 col-lg-4">
+              <a href="{{ attraction.get_absolute_url }}" class="text-decoration-none text-reset d-block h-100">
+                <div class="card acd-tile h-100">
+                  <div class="ratio ratio-4x3 overflow-hidden acd-media-placeholder rounded-top-4">
+                    {% if attraction.display_image %}
+                    <img src="{{ attraction.display_image }}" alt="{{ attraction.name }}" style="object-fit: cover;">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="acd-icon-chip"><i class="bi bi-image"></i></span>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="card-body">
+                    <h3 class="h6 mb-1">{{ attraction.name }}</h3>
+                    {% if attraction.summary %}<p class="text-muted small mb-0">{{ attraction.summary }}</p>{% endif %}
+                  </div>
+                </div>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="acd-empty-state">
+            <span class="acd-empty-icon"><i class="bi bi-camera"></i></span>
+            <p class="text-muted mb-0">{% t "جاذبه‌ای برای این کشور ثبت نشده است." %}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item acd-reveal">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#countryHotels">
+          <i class="bi bi-building me-2"></i> {% t "هتل‌های معروف" %}
+          {% if hotels %}<span class="badge acd-count-badge ms-2">{{ hotels|length }}</span>{% endif %}
+        </button>
+      </h2>
+      <div id="countryHotels" class="accordion-collapse collapse" data-bs-parent="#countryExtrasAccordion">
+        <div class="accordion-body">
+          {% if hotels %}
+          <div class="row g-4">
+            {% for hotel in hotels %}
+            <div class="col-sm-6 col-lg-4">
+              <a href="{{ hotel.get_absolute_url }}" class="text-decoration-none text-reset d-block h-100">
+                <div class="card acd-tile h-100">
+                  <div class="ratio ratio-4x3 overflow-hidden acd-media-placeholder rounded-top-4">
+                    {% if hotel.display_image %}
+                    <img src="{{ hotel.display_image }}" alt="{{ hotel.name }}" style="object-fit: cover;">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="acd-icon-chip"><i class="bi bi-building"></i></span>
+                    </div>
+                    {% endif %}
+                    <span class="acd-hotel-stars">{{ hotel.get_star_rating_display }}</span>
+                  </div>
+                  <div class="card-body">
+                    <h3 class="h6 mb-1">{{ hotel.name }}</h3>
+                    {% if hotel.city %}<p class="acd-hotel-city mb-1"><i class="bi bi-geo-alt"></i> {{ hotel.city }}</p>{% endif %}
+                    {% if hotel.summary %}<p class="text-muted small mb-0">{{ hotel.summary }}</p>{% endif %}
+                  </div>
+                </div>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="acd-empty-state">
+            <span class="acd-empty-icon"><i class="bi bi-building"></i></span>
+            <p class="text-muted mb-0">{% t "هتلی برای این کشور ثبت نشده است." %}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item acd-reveal">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#countryRoutes">
+          <i class="bi bi-signpost-2 me-2"></i> {% t "فاصله و مسیر سفر تا اینجا" %}
+        </button>
+      </h2>
+      <div id="countryRoutes" class="accordion-collapse collapse" data-bs-parent="#countryExtrasAccordion">
+        <div class="accordion-body">
+          {% if has_routes %}
+          {% comment %}
+            Deliberately not run through the JS-string-escaping filter here:
+            that filter turns quote characters into literal backslash-escape
+            text, which is correct inside an actual script element but breaks
+            JSON sitting in an HTML attribute -- getAttribute() never
+            reverses that escaping, so parsing it as JSON would always
+            silently fail and the calculator would always show "not found"
+            no matter what. Plain autoescaping (the template engine's
+            default for an interpolated variable) HTML-entity-escapes the
+            quotes instead, which the browser DOES reverse when reading the
+            attribute back -- that's what makes the JSON valid client-side.
+          {% endcomment %}
+          <div class="acd-route-calc" data-routes="{{ routes_json }}">
+            <p class="text-muted small mb-3">{% t "کشور مبدا و نوع مسیر رو انتخاب کن تا فاصله و زمان تقریبی سفر رو ببینی." %}</p>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-info-circle"></i>
+              {% t "برای کشورهایی که هنوز مسیر واقعی ثبت نشده، فاصله و زمان به‌صورت تخمینی (بر اساس فاصله مستقیم) نمایش داده می‌شود." %}
+            </p>
+            <div class="row g-3 align-items-end">
+              <div class="col-sm-5">
+                <label class="form-label small fw-semibold">{% t "از کشور" %}</label>
+                <select class="form-select" id="acdRouteOrigin">
+                  <option value="">{% t "انتخاب کنید" %}</option>
+                  {% for origin in world_origins %}
+                  <option value="{{ origin.code }}">{{ origin.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-sm-5">
+                <label class="form-label small fw-semibold">{% t "نوع مسیر" %}</label>
+                <select class="form-select" id="acdRouteMode">
+                  <option value="">{% t "انتخاب کنید" %}</option>
+                  {% for value, label in travel_modes %}
+                  <option value="{{ value }}">{% t label %}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-sm-2">
+                <button type="button" class="btn btn-acd-primary w-100" id="acdRouteShow">{% t "نمایش نتیجه" %}</button>
+              </div>
+            </div>
+            <div id="acdRouteResult" class="acd-route-result mt-4 d-none"></div>
+            <div id="acdRouteEmpty" class="acd-route-result acd-route-result--empty mt-4 d-none">
+              {% t "برای این ترکیب مبدا/مسیر هنوز اطلاعاتی ثبت نشده است." %}
+            </div>
+          </div>
+          {% else %}
+          <div class="acd-empty-state">
+            <span class="acd-empty-icon"><i class="bi bi-signpost-2"></i></span>
+            <p class="text-muted mb-0">{% t "هنوز مسیری برای این کشور ثبت نشده است." %}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+

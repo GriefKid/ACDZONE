@@ -1,0 +1,195 @@
+{% load i18n static acd_i18n %}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top acd-header">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
+      <img src="{% static 'img/logo.svg' %}" alt="{{ SITE_NAME }}" height="34"
+           onerror="this.style.display='none'">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#acdNav"
+            aria-controls="acdNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="acdNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'core:home' %}">{% t "خانه" %}</a>
+        </li>
+        <!-- Dashboard is just a menu of links to other pages (most of
+             which are already public), so it's shown to signed-out
+             visitors too now — no reason to hide the menu itself just
+             because a couple of its tiles (my_products, support tickets)
+             still require an account once clicked. -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'core:dashboard' %}">{% t "داشبورد" %}</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% t "نماینده‌ها" %}
+          </a>
+          <ul class="dropdown-menu acd-representative-menu">
+            {% for representative in representatives %}
+            <li>
+              <a class="dropdown-item acd-rep-menu-card"
+                 href="{{ representative.get_absolute_url }}"
+                 {% if representative.country.display_background %}style="--rep-country-bg: url('{{ representative.country.display_background }}');"{% endif %}>
+                <span class="acd-rep-menu-media">
+                  {% if representative.display_photo %}
+                  <img src="{{ representative.display_photo }}" alt="" class="acd-rep-avatar-sm">
+                  {% elif representative.country.display_flag %}
+                  <img src="{{ representative.country.display_flag }}" alt="" class="acd-country-flag-sm">
+                  {% else %}
+                  <span class="acd-rep-avatar-sm acd-rep-avatar-fallback">{{ representative.first_name|first }}{{ representative.last_name|first }}</span>
+                  {% endif %}
+                </span>
+                <span class="acd-rep-menu-text">
+                  <span class="acd-rep-menu-name">{{ representative.full_name }}</span>
+                  <span class="acd-rep-menu-country">{{ representative.country.name }}</span>
+                </span>
+              </a>
+            </li>
+            {% empty %}
+            <li><span class="dropdown-item-text text-muted small">
+              {% t "نماینده‌ای ثبت نشده است." %}
+            </span></li>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center flex-wrap gap-2 acd-header-tools">
+
+        <!-- Country selector — countries is a real Country queryset now
+             (apps/core/context_processors.py), admin-managed from
+             /admin/. Each item routes to that country's own page
+             (background, flag, anthem, description — see
+             apps/core/views.py country_detail). -->
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-light dropdown-toggle acd-header-tool" type="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-globe2"></i> {% t "کشورها" %}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end acd-country-menu">
+            {% for country in countries %}
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" href="{{ country.get_absolute_url }}">
+                {% if country.display_flag %}
+                <img src="{{ country.display_flag }}" alt="" class="acd-country-flag-sm">
+                {% endif %}
+                {{ country.name }}
+              </a>
+            </li>
+            {% empty %}
+            <li><span class="dropdown-item-text text-muted small">
+              {% t "لیست کشورها از پنل ادمین مدیریت می‌شود (به‌زودی)" %}
+            </span></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Language switcher. Each option submits its own tiny form to
+             the set_language view. The redirect target for each option
+             comes from the language_url template tag (see
+             apps/core/templatetags/acd_i18n.py), which resolves the
+             current view name plus its actual arguments under a
+             language override — this handles pages that take URL
+             parameters too (like the buy page), not only simple ones.
+             Reminder for future edits to this comment: never type the
+             literal template tag delimiters here as example text,
+             spelled out or otherwise — Django's parser scans the raw
+             template source for those regardless of HTML comment
+             boundaries, and a stray one breaks the page. -->
+        {% get_current_language as CURRENT_LANGUAGE %}
+        {% get_available_languages as AVAILABLE_LANGUAGES %}
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-light dropdown-toggle acd-header-tool acd-flag-option acd-flag-{{ CURRENT_LANGUAGE }}"
+                  type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ CURRENT_LANGUAGE|upper }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+            <li>
+              <form action="{% url 'set_language' %}" method="post" class="m-0">
+                {% csrf_token %}
+                <input type="hidden" name="language" value="{{ lang_code }}">
+                <input type="hidden" name="next" value="{% language_url lang_code %}">
+                <button type="submit"
+                        class="dropdown-item acd-flag-option acd-flag-{{ lang_code }} {% if lang_code == CURRENT_LANGUAGE %}active{% endif %}">
+                  {{ lang_code|upper }} · {% if lang_code == 'fa' %}{% t "فارسی" %}{% else %}{{ lang_name }}{% endif %}
+                </button>
+              </form>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Notifications bell — in-site only (see apps/core/models.py
+             Notification docstring for why this isn't a real browser push
+             notification). Server-rendered here so there's no flash of
+             empty state before static/js/notifications.js's first poll
+             resolves; that script then keeps the count live (polling
+             while closed, refetching the list the moment it's opened —
+             see the script for why the context processor alone can't do
+             that: apps/core/context_processors.py only recomputes on a
+             fresh page render) and handles the mark-all-read click. -->
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-light position-relative acd-header-tool" type="button" id="acd-notif-toggle"
+                  data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            <i class="bi bi-bell-fill"></i>
+            <span class="acd-notif-badge{% if not unread_notifications_count %} d-none{% endif %}" id="acd-notif-badge">{{ unread_notifications_count|default:0 }}</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end acd-notif-menu" id="acd-notif-menu" aria-labelledby="acd-notif-toggle"
+              data-unread-url="{% url 'core:notifications_unread_count' %}"
+              data-list-url="{% url 'core:notifications_list' %}"
+              data-mark-all-url="{% url 'core:notifications_mark_all_read' %}">
+            <li id="acd-notif-empty-item"{% if recent_notifications %} class="d-none"{% endif %}>
+              <span class="dropdown-item-text text-muted small">{% t "اعلانی وجود ندارد" %}</span>
+            </li>
+            {% for note in recent_notifications %}
+            <li class="acd-notif-li">
+              <a class="dropdown-item acd-notif-item{% if not note.is_read %} acd-notif-unread{% endif %}"
+                 href="{% url 'core:notification_open' note.pk %}">
+                <span class="acd-notif-message">{{ note.message }}</span>
+                <span class="acd-notif-time">{{ note.created_at|timesince }} {% t "پیش" %}</span>
+              </a>
+            </li>
+            {% endfor %}
+            <li id="acd-notif-divider"{% if not recent_notifications %} class="d-none"{% endif %}><hr class="dropdown-divider"></li>
+            <li id="acd-notif-mark-all-item"{% if not recent_notifications %} class="d-none"{% endif %}>
+              <button type="button" class="dropdown-item text-center small" id="acd-notif-mark-all">
+                {% t "علامت‌گذاری همه به‌عنوان خوانده‌شده" %}
+              </button>
+            </li>
+          </ul>
+        </div>
+        {% endif %}
+
+        <!-- Membership / login -->
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center acd-header-tool" type="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="acd-avatar-chip">{{ user.get_username|first|upper }}</span> {{ user.get_username }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">{% t "پروفایل" %}</a></li>
+            <li><a class="dropdown-item" href="{% url 'shop:my_products' %}">{% t "محصولات من" %}</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item">{% t "خروج" %}</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-outline-light">{% t "ورود" %}</a>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-sm btn-acd-primary">{% t "عضویت" %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

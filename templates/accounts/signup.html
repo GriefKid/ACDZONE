@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "عضویت" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 480px;">
+  <div class="acd-auth-card acd-reveal">
+    <div class="acd-auth-banner">
+      <i class="bi bi-person-plus fs-1 mb-2 d-block"></i>
+      <h1 class="h4 mb-0 text-white">{% t "ساخت حساب کاربری جدید" %}</h1>
+    </div>
+    <div class="bg-white p-4">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-acd-primary w-100 mt-3">{% t "عضویت" %}</button>
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center mt-3">
+    {% t "قبلاً حساب کاربری ساخته‌اید؟" %}
+    <a href="{% url 'accounts:login' %}">{% t "وارد شوید" %}</a>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n humanize %}
+
+{% block title %}{% t "ثبت درخواست خرید" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 560px;">
+  <div class="acd-auth-card acd-reveal">
+    <div class="acd-auth-banner">
+      <i class="bi bi-bag-check fs-1 mb-2 d-block"></i>
+      <h1 class="h4 mb-1 text-white">{{ product.title }}</h1>
+      <p class="mb-0" style="color: rgba(255,255,255,.85);">{{ product.price|intcomma }} {% t "تومان" %}</p>
+    </div>
+    <div class="bg-white p-4">
+      <p class="text-muted small">
+        {% t "این فرم فقط درخواست خرید را ثبت می‌کند؛ راهنمای پرداخت را همکاران ما برایتان ارسال می‌کنند." %}
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-acd-primary w-100 mt-3">{% t "ثبت درخواست خرید" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

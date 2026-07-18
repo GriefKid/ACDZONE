@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "پشتیبانی" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 acd-reveal">
+    <h1 class="h3 mb-0">{% t "تیکت‌های پشتیبانی" %}</h1>
+    <a href="{% url 'support:ticket_create' %}" class="btn btn-acd-primary">
+      <i class="bi bi-plus-lg me-1"></i> {% t "تیکت جدید" %}
+    </a>
+  </div>
+
+  {% if tickets %}
+  <div class="row g-4">
+    {% for ticket in tickets %}
+    <div class="col-md-6 acd-reveal">
+      <a href="{{ ticket.get_absolute_url }}" class="text-decoration-none text-reset d-block h-100">
+        <div class="card acd-tile h-100 p-4">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <h2 class="h6 mb-0">{{ ticket.subject }}</h2>
+            <span class="acd-status-pill acd-status-{{ ticket.status }}">{% t ticket.get_status_display %}</span>
+          </div>
+          <span class="acd-news-date"><i class="bi bi-clock-history"></i> {{ ticket.updated_at|timesince }} {% t "پیش" %}</span>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="acd-empty-state acd-reveal">
+    <span class="acd-empty-icon"><i class="bi bi-life-preserver"></i></span>
+    <p class="text-muted mb-3">
+      {% t "هنوز تیکتی ثبت نکرده‌اید. اگر سوالی دارید یا مشکلی پیش اومده، از همینجا با پشتیبانی در تماس باشید." %}
+    </p>
+    <a href="{% url 'support:ticket_create' %}" class="btn btn-acd-primary">{% t "ثبت تیکت جدید" %}</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

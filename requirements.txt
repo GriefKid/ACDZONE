@@ -1,0 +1,17 @@
+# Core framework
+Django>=5.2,<5.3                  # LTS release, security support into ~2028
+
+# Environment / settings management (.env file, DATABASE_URL parsing so
+# switching from SQLite to PostgreSQL later needs zero code changes)
+django-environ>=0.11,<1.0
+
+# Bilingual (Persian/English) database content — product names, post
+# bodies, etc. — once models register translation.py options
+django-modeltranslation>=0.18,<0.20
+
+# Modern, customizable, bilingual-friendly admin panel theme
+django-unfold>=0.90,<1.0
+
+# Image handling (product photos, post images, avatars) — used starting
+# from the next implementation stage
+Pillow>=10.4,<12.0

@@ -1,0 +1,93 @@
+{% load i18n acd_i18n %}
+<!-- Permanent site mascot — a friendly tiger cub (tigers historically
+     range across most of Asia — from the Caucasus/Iran through South and
+     Southeast Asia to Siberia/China — which reads as "Asia" far more
+     broadly than a single-country animal would; chosen as a non-human
+     symbol on purpose too, to sidestep any single-country/ethnicity
+     representation question on a site spanning 36 different Asian
+     countries) that stays on-screen on every page, for every visitor,
+     signed in or not, and points at "داشبورد" — the page that actually
+     surfaces every service (ACDPay, ACDBallons, ACDNews, ACDNotes, My
+     Products, Support).
+
+     Always rendered now (no auth check, no "seen once" gate) — see
+     static/js/main.js: it plays its entrance/wave once per page load,
+     then just stays put; the close button only hides it for the current
+     page view, it comes back on the next page/reload by design. -->
+<div class="acd-mascot-widget" id="acdMascotWidget">
+  <div class="acd-mascot-bubble">
+    <button type="button" class="acd-mascot-close" id="acdMascotClose" aria-label="{% t 'بستن' %}">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <p class="acd-mascot-text">{% t "سلام! رو دکمه‌ی «داشبورد» بزن تا همه‌ی خدمات ما رو یک‌جا ببینی." %}</p>
+    <a href="{% url 'core:dashboard' %}" class="btn btn-acd-primary btn-sm w-100">{% t "برو داشبورد" %}</a>
+  </div>
+
+  <svg class="acd-mascot-svg" viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg" role="img"
+       aria-label="{% t 'ببر همراه ACD Zone' %}">
+    <ellipse class="acd-mascot-shadow" cx="88" cy="160" rx="42" ry="7"/>
+
+    <!-- curled tail, tucked behind the body -->
+    <path d="M 120 130 Q 148 132 150 108 Q 151 92 136 90"
+          fill="none" stroke="#e08a34" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 140 96 Q 146 98 148 106" fill="none" stroke="#231f1a" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- feet -->
+    <ellipse cx="66" cy="148" rx="16" ry="11" fill="#e08a34"/>
+    <ellipse cx="110" cy="148" rx="16" ry="11" fill="#e08a34"/>
+
+    <!-- body -->
+    <ellipse cx="88" cy="122" rx="38" ry="34" fill="#ee9a3f"/>
+    <ellipse cx="88" cy="132" rx="22" ry="20" fill="#fff6e8"/>
+    <path d="M 58 106 Q 88 98 118 106" fill="none" stroke="#231f1a" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- small gold travel case, tying the mascot back to the brand -->
+    <g>
+      <rect x="76" y="118" width="24" height="19" rx="4" fill="var(--acd-gold)" stroke="var(--acd-gold-dark)" stroke-width="1.5"/>
+      <rect x="84" y="112" width="8" height="7" rx="2" fill="var(--acd-gold-dark)"/>
+    </g>
+
+    <!-- static arm -->
+    <ellipse cx="54" cy="126" rx="10" ry="16" fill="#ee9a3f" transform="rotate(18 54 126)"/>
+
+    <!-- waving arm (animated — see .acd-mascot-arm-wave) -->
+    <g class="acd-mascot-arm-wave">
+      <ellipse cx="122" cy="120" rx="10" ry="17" fill="#ee9a3f"/>
+      <path d="M 118 112 Q 122 116 118 122" fill="none" stroke="#231f1a" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- head -->
+    <circle cx="88" cy="60" r="36" fill="#ee9a3f"/>
+
+    <!-- ears -->
+    <path d="M 58 34 Q 52 16 70 24 Z" fill="#ee9a3f"/>
+    <path d="M 118 34 Q 124 16 106 24 Z" fill="#ee9a3f"/>
+    <path d="M 60 30 Q 57 20 67 25 Z" fill="#231f1a"/>
+    <path d="M 116 30 Q 119 20 109 25 Z" fill="#231f1a"/>
+
+    <!-- forehead stripes -->
+    <path d="M 88 26 Q 84 34 86 40" fill="none" stroke="#231f1a" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 72 28 Q 70 36 74 42" fill="none" stroke="#231f1a" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 104 28 Q 106 36 102 42" fill="none" stroke="#231f1a" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- muzzle -->
+    <ellipse cx="88" cy="72" rx="21" ry="16" fill="#fff6e8"/>
+
+    <!-- eyes -->
+    <circle cx="72" cy="58" r="6.5" fill="#ffffff"/>
+    <circle cx="104" cy="58" r="6.5" fill="#ffffff"/>
+    <circle class="acd-mascot-pupil" cx="73" cy="59" r="3.2" fill="#231f1a"/>
+    <circle class="acd-mascot-pupil" cx="103" cy="59" r="3.2" fill="#231f1a"/>
+    <path d="M 63 52 Q 72 47 80 52" fill="none" stroke="#231f1a" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 96 52 Q 104 47 113 52" fill="none" stroke="#231f1a" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- nose + smile -->
+    <path d="M 82 68 Q 88 65 94 68 Q 92 73 88 73 Q 84 73 82 68 Z" fill="#231f1a"/>
+    <path d="M 88 73 Q 88 80 80 82" fill="none" stroke="#231f1a" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 88 73 Q 88 80 96 82" fill="none" stroke="#231f1a" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- cheeks -->
+    <ellipse cx="64" cy="72" rx="5" ry="3" fill="rgba(179,69,44,0.28)"/>
+    <ellipse cx="112" cy="72" rx="5" ry="3" fill="rgba(179,69,44,0.28)"/>
+  </svg>
+</div>

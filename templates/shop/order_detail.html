@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load i18n acd_i18n %}
+
+{% block title %}{% t "جزئیات سفارش" %} #{{ order.pk }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <a href="{% url 'shop:my_products' %}" class="d-inline-flex align-items-center gap-1 mb-4 text-decoration-none">
+    <i class="bi bi-{% if LANGUAGE_BIDI %}arrow-right{% else %}arrow-left{% endif %}"></i>
+    {% t "بازگشت به محصولات من" %}
+  </a>
+
+  <div class="card acd-tile p-4 mb-4 acd-reveal">
+    <div class="d-flex align-items-center gap-3 flex-wrap justify-content-between">
+      <div>
+        <h1 class="h4 mb-1">{{ order.product.title }}</h1>
+        <p class="text-muted small mb-0">
+          {% t "شماره سفارش" %}: #{{ order.pk }} &middot;
+          {% t "تاریخ ثبت" %}: {{ order.created_at|date:"Y/m/d" }}
+        </p>
+      </div>
+      <span class="badge-trust"><i class="bi bi-dot"></i> {% t order.stage_label %}</span>
+    </div>
+  </div>
+
+  <div class="card acd-tile p-4 acd-reveal">
+    <h2 class="h6 mb-4">{% t "مرحله‌ی سفارش" %}</h2>
+    <div class="acd-stepper">
+      {% for step in order.get_stage_progress %}
+      <div class="acd-step acd-step--{{ step.status }}">
+        <span class="acd-step-index">
+          {% if step.status == 'done' %}<i class="bi bi-check-lg"></i>{% else %}{{ step.index }}{% endif %}
+        </span>
+        <span class="acd-step-label">{% t step.label %}</span>
+      </div>
+      {% if not forloop.last %}
+      <i class="bi bi-chevron-{% if LANGUAGE_BIDI %}left{% else %}right{% endif %} text-muted align-self-center mx-1"></i>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
