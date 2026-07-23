@@ -19,6 +19,13 @@ PAGE_CHOICES = [
     (PAGE_ACDBALLOONS, 'ACDBallons'),
 ]
 
+SERVICE_IMAGE_PATHS = {
+    'یونیون‌کارت': 'img/services/unioncard.svg',
+    'ویزاکارت': 'img/services/visacard.svg',
+    'بالن‌سواری آب‌سرد': 'img/services/balloon-absard.svg',
+    'بالن‌سواری احمدآباد مستوفی': 'img/services/balloon-ahmadabad.svg',
+}
+
 # Every stage that exists anywhere, keyed by a stable machine name. Several
 # keys are shared between both flows below because they mean the same thing
 # for cards and tickets alike (submitted / payment_info_sent / etc.).
@@ -126,9 +133,9 @@ class Product(models.Model):
 
     @property
     def display_image(self):
-        """Prefer an uploaded photo; fall back to the external image_url
-        placeholder (how every product ships today, before real product
-        photos exist)."""
+        service_image = SERVICE_IMAGE_PATHS.get(self.title_fa)
+        if service_image:
+            return f'{settings.STATIC_URL.rstrip("/")}/{service_image}'
         if self.image:
             return self.image.url
         return self.image_url
