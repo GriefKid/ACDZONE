@@ -41,6 +41,15 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
+# Best-effort public IP reputation check. Results are cached per IP and all
+# provider failures fail open so an external outage cannot take down the site.
+VPN_DETECTION_ENABLED = env.bool('VPN_DETECTION_ENABLED', default=True)
+VPN_DETECTION_BLOCK_DATACENTER = env.bool('VPN_DETECTION_BLOCK_DATACENTER', default=True)
+VPN_DETECTION_API_URL = env('VPN_DETECTION_API_URL', default='https://api.ipquery.io/{ip}')
+VPN_DETECTION_TIMEOUT_SECONDS = env.int('VPN_DETECTION_TIMEOUT_SECONDS', default=3)
+VPN_DETECTION_CACHE_SECONDS = env.int('VPN_DETECTION_CACHE_SECONDS', default=43200)
+VPN_DETECTION_FAILURE_CACHE_SECONDS = env.int('VPN_DETECTION_FAILURE_CACHE_SECONDS', default=300)
+
 
 # ------------------------------------------------------------------------
 # Applications

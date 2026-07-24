@@ -5,6 +5,19 @@
 // scroll-aware "glass" header state, and a scroll-reveal animation.
 
 document.addEventListener('DOMContentLoaded', function () {
+  // Re-run the server-side connection check after the visitor turns off VPN.
+  var vpnRetryButton = document.getElementById('acdVpnRetry');
+  if (vpnRetryButton) {
+    vpnRetryButton.addEventListener('click', function () {
+      vpnRetryButton.disabled = true;
+      vpnRetryButton.classList.add('is-checking');
+      vpnRetryButton.innerHTML =
+        '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>' +
+        '<span>' + vpnRetryButton.dataset.rechecking + '</span>';
+      window.location.reload();
+    });
+  }
+
   // Highlight the current page's nav link.
   var links = document.querySelectorAll('.navbar-nav .nav-link');
   links.forEach(function (link) {

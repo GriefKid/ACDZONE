@@ -1,4 +1,5 @@
 from django.middleware.csrf import get_token
+from apps.core.vpn_detection import get_vpn_status
 
 # Safe to import at module level (unlike ChatMessage's local import below) —
 # Country lives in this exact same app (apps.core.models), so there's no
@@ -20,6 +21,7 @@ def site_settings(request):
         'SITE_NAME': 'ACD Zone',
         'CONTACT_TELEGRAM_URL': '#',
         'CONTACT_WHATSAPP_URL': '#',
+        'vpn_status': get_vpn_status(request),
     }
 
     # The floating chat widget (templates/partials/chat_widget.html) sends

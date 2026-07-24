@@ -1,0 +1,51 @@
+{% load i18n %}
+{% if vpn_status.blocked %}
+<div class="acd-vpn-gate" role="dialog" aria-modal="true" aria-labelledby="acdVpnTitle" aria-describedby="acdVpnDescription">
+  <div class="acd-vpn-aurora acd-vpn-aurora--one" aria-hidden="true"></div>
+  <div class="acd-vpn-aurora acd-vpn-aurora--two" aria-hidden="true"></div>
+
+  <section class="acd-vpn-card">
+    <div class="acd-vpn-card__shine" aria-hidden="true"></div>
+    <div class="acd-vpn-icon" aria-hidden="true">
+      <i class="bi bi-shield-lock-fill"></i>
+    </div>
+
+    {% if LANGUAGE_CODE == 'en' %}
+      <span class="acd-vpn-eyebrow"><i class="bi bi-wifi-off"></i> Secure connection check</span>
+      <h1 id="acdVpnTitle">Please turn off your VPN</h1>
+      <p id="acdVpnDescription">
+        Your connection appears to use a VPN, proxy, Tor, or data-center network.
+        For account and payment security, turn it off before entering ACD Zone.
+      </p>
+      <div class="acd-vpn-steps">
+        <span><b>1</b> Disable your VPN or proxy</span>
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        <span><b>2</b> Check the connection again</span>
+      </div>
+      <button id="acdVpnRetry" class="acd-vpn-retry" type="button" data-rechecking="Checking connection…">
+        <i class="bi bi-arrow-clockwise"></i>
+        Check again
+      </button>
+      <p class="acd-vpn-help">VPN already off? <a href="mailto:info@acdzone.com">Contact support</a></p>
+    {% else %}
+      <span class="acd-vpn-eyebrow"><i class="bi bi-wifi-off"></i> بررسی امنیت اتصال</span>
+      <h1 id="acdVpnTitle">لطفاً فیلترشکن را خاموش کنید</h1>
+      <p id="acdVpnDescription">
+        اتصال شما از طریق VPN، پراکسی، تور یا شبکه دیتاسنتری شناسایی شده است.
+        برای حفظ امنیت حساب و پرداخت‌ها، قبل از ورود به ACD Zone فیلترشکن را خاموش کنید.
+      </p>
+      <div class="acd-vpn-steps">
+        <span><b>۱</b> فیلترشکن یا پراکسی را خاموش کنید</span>
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        <span><b>۲</b> دوباره اتصال را بررسی کنید</span>
+      </div>
+      <button id="acdVpnRetry" class="acd-vpn-retry" type="button" data-rechecking="در حال بررسی اتصال…">
+        <i class="bi bi-arrow-clockwise"></i>
+        بررسی دوباره
+      </button>
+      <p class="acd-vpn-help">فیلترشکن خاموش است؟ <a href="mailto:info@acdzone.com">با پشتیبانی تماس بگیرید</a></p>
+    {% endif %}
+  </section>
+</div>
+<script>document.documentElement.classList.add('acd-vpn-locked');</script>
+{% endif %}
